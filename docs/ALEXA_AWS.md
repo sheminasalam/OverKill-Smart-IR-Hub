@@ -1,5 +1,7 @@
 # AWS IoT, Lambda, account linking and Alexa setup
 
+> **Account linking is mandatory for an Alexa Smart Home skill.** You must configure Login with Amazon (LWA) account linking and complete **Link Account** in the Alexa app. This is not an optional step for the cloud Smart Home route. The local Emulated Hue path is separate and does not use this AWS/LWA setup. See [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md).
+
 > **This guide covers the cloud Alexa Smart Home path only.** For device-aware remote controls (TV, fan, AC, streamer and other supported categories), the **OverKill Smart Hub custom integration is required** and the hub must use **Custom Integration (Alexa + HA entities)** discovery mode. The firmware's local **Emulated Hue** option is an alternative for simple on/off command switches on the LAN; it does not use AWS or this guide's cloud route. See [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md) before starting.
 
 ## Create the AWS IoT Core bridge certificate
@@ -122,6 +124,16 @@ The Lambda source in this repository is the updated file provided by the project
 | `STATUS_TOPIC` | Optional | Defaults to `alexa/status/{hub}`; hub status topic template. Keep `{hub}` literal. |
 | `WRITE_STATE` | Optional | Defaults to enabled. Set exactly to `false` if the hub/integration should be the only state writer. |
 
+The following variable names may be present in a different/deployed revision, but **they are not read by the `alexa_lambda/index.mjs` committed in this repository**:
+
+| Variable | Status in committed source | Meaning for this version |
+|---|---|---|
+| `ALEXA_EVENT_CLIENT_ID` | Not used | No Event Gateway client-ID/token-exchange flow is implemented. Setting this variable does not enable Alexa Events. |
+| `ALEXA_EVENT_CLIENT_SECRET` | Not used | No Event Gateway client-secret/token-exchange flow is implemented. Do not add a secret expecting this source to send proactive events. |
+| `DELETE_LEGACY_TV_SCENES_ON_ACCEPT_GRANT` | Not used | This source does not implement legacy TV-scene deletion on `AcceptGrant`; this variable has no effect. |
+
+**Deployment-source warning:** I can verify only the code committed in this repository, not an independently deployed function inside your AWS account. If your deployed Lambda uses these variables, it is a different code version; export that deployed source and reconcile it with this repository before treating the variables or behavior as supported.
+
 The endpoint must be provided by your own AWS account. Never copy an endpoint from someone else's project and assume it is yours.
 
 ### Lambda execution-role permissions
@@ -195,7 +207,7 @@ The Lambda package should already be deployed using the earlier section of this 
 
 ### Step 3 of 3 — Configure Login with Amazon account linking
 
-Smart Home skills require account linking. The LWA security profile and the Smart Home skill are separate objects; this step connects them.
+Smart Home skills require account linking. The LWA security profile and the Smart Home skill are separate objects; this step connects them. Do not skip this step even if discovery and power directives work in Lambda console tests.
 
 1. In the [Login with Amazon console](https://developer.amazon.com/loginwithamazon), create a **Security Profile** for OverKill. Record its **Client ID** and **Client Secret** privately as `LWA_CLIENT_ID` and `LWA_CLIENT_SECRET`.
 2. Return to the Alexa Developer Console → your Smart Home skill → **Account Linking** → **Setup Account Linking**.
