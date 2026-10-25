@@ -68,10 +68,10 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 | Qty. | Component | Use / selection notes |
 |---:|---|---|
 | 1 | ESP8266 ESP-12F module | Main controller. Use a carrier/adapter that exposes the required GPIOs and permits programming. Confirm the exact module's flash capacity and pinout. |
-| 1 | W25Q32 SPI flash module (4 MiB) | External database shown in the diagram. Firmware detects W25Qxx family devices; use the exact part you intend to support and test it. The flash module pin labels vary by breakout. |
+| 1 | [W25Q32 32-Mbit SPI flash module](https://quartzcomponents.com/products/w25q32-32mbit-capacity-flash-storage-module?variant=44978575376618) | Exact module used. 32 Mbit = 4 MiB. Supplier lists SPI, 2.7–3.6 V operation and 100,000 program/erase cycles. Power it from 3.3 V, not 5 V, and confirm the breakout pin labels. |
 | 1 | KY-022 IR receiver module or compatible demodulating 940 nm receiver | Receives IR from original remotes. Use the labels on the actual module to identify OUT, VCC and GND; do not assume a universal physical pin order. |
-| 12 | 940 nm IR LEDs | Diagram names L-518EIR1BC1-S61 and shows 6 branches with 2 LEDs in series in each branch. Verify the part's forward voltage, continuous/pulsed current and duty-cycle ratings from its datasheet. |
-| 1 | AO3400 N-channel MOSFET, or a verified equivalent | Low-side switch for the IR LED array. Verify its gate drive, current, pulse and thermal specifications for your load. |
+| 12 | [L518EIR1BC1-S61 940-nm, 5-mm IR transmitter LED](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led?variant=46154073506026) | Exact LED used. The seller identifies it as a 940-nm 5-mm IR emitter. Use 12 total in six branches of two series LEDs as drawn, but do not assume the 30 Ω resistor is validated until the exact part datasheet/current limits are checked. |
+| 1 | [AO3400 N-channel MOSFET, SOT-23](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package?variant=44716853821674) | Exact part used. Supplier listing states 30 V drain-source voltage and up to 5.8 A drain current, but that headline current depends on package/PCB thermal conditions. The ESP8266 drives the gate at 3.3 V, so verify that the actual device is adequately enhanced at that gate voltage and check the SOT-23 thermal rise. |
 | 6 | 30 Ω, 1/4 W resistors (as drawn) | One in series with each two-LED branch. **Treat this as the value in the supplied drawing, not an electrically validated value.** Calculate branch current and resistor dissipation for the actual LEDs and supply before assembly. |
 | 1 | 100 Ω resistor | Gate series resistor shown between ESP GPIO4 and MOSFET gate. |
 | 1 | 10 kΩ resistor | Gate-to-GND pulldown shown in the driver drawing; helps keep the MOSFET off during reset/boot. |
@@ -80,7 +80,7 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 | 1 | 10 µF capacitor | 5 V input decoupling shown in the diagram. |
 | 1 | 10 µF capacitor | 3.3 V rail bulk decoupling shown in the diagram. |
 | 1 | 100 nF capacitor | 3.3 V high-frequency decoupling shown in the diagram. Place close to the ESP/peripheral supply pins where practical. |
-| 1 (optional) | DS18B20 temperature sensor | Optional temperature input; firmware default is GPIO16. |
+| 1 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/products/ds18b20-water-proof-temperature-sensor?variant=31898050953351) | Exact sensor used. Three-wire 1-Wire digital probe; firmware default data pin is GPIO16. Add the 4.7 kΩ pull-up from DATA to 3.3 V shown in the circuit. Confirm the wire colours against the supplied probe/measurement before connecting. |
 | 1 | 4.7 kΩ resistor | DS18B20 data pull-up to 3.3 V, if using the sensor as drawn. |
 | 1 | Status LED and current-limiting resistor | Firmware default is one active-LOW status output on GPIO2. The circuit drawing depicts a common-anode RGB LED and three GPIOs, which do not match the present firmware pin map. Choose one implementation after verifying code and hardware. |
 | 1 | Reset/programming arrangement | Use the reset and boot/program pins required by the ESP-12F carrier. The additional reset button shown in the diagram is not represented by a separate GPIO in the current firmware source. |
@@ -96,6 +96,17 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 5. Test one LED branch first. Check current and temperature before populating or enabling all six branches.
 6. Do not run the ESP8266 and all twelve IR LEDs through a small 3.3 V regulator. Use a correctly sized 5 V source and an appropriate 3.3 V regulator for the logic.
 7. Disconnect power before continuity checks and before changing any SPI/GPIO wiring.
+
+### Exact parts used in this build
+
+These are the specific parts selected by the project author, rather than generic alternatives:
+
+- [AO3400 30 V N-channel MOSFET, SOT-23](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package?variant=44716853821674)
+- [L518EIR1BC1-S61 940 nm, 5 mm IR transmitter LED](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led?variant=46154073506026) — 12 pieces for the six-branch array shown.
+- [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/products/ds18b20-water-proof-temperature-sensor?variant=31898050953351)
+- [W25Q32 32-Mbit (4-MiB) SPI flash module](https://quartzcomponents.com/products/w25q32-32mbit-capacity-flash-storage-module?variant=44978575376618)
+
+The supplier product pages are the procurement references. For electrical design, use the manufacturer datasheet for the exact item shipped (particularly the IR LED's continuous and pulsed current ratings and the MOSFET's on-resistance at a 3.3 V gate drive); a shop listing headline is not a substitute for those guaranteed limits.
 
 ## 4. Confirm the pin map before assembly
 
