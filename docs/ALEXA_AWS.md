@@ -13,7 +13,7 @@ This guide follows the submitted Lambda handler and Home Assistant integration. 
 
 The Lambda defaults to IOT_REGION=eu-west-1, reads retained device catalogue alexa/config/devices, reads state from alexa/state/{id}, publishes directives to alexa/{hub}/directive, and checks alexa/status/{hub}. Optional environment variables in the source are IOT_ENDPOINT, CONFIG_TOPIC, STATE_TOPIC, CMD_TOPIC, STATUS_TOPIC, and WRITE_STATE. Set WRITE_STATE=false to make the hub the only state writer.
 
-The handler contains an AWS IoT endpoint copied from the supplied source. Verify that it belongs to your own account and replace it before deployment if needed. Alexa region compatibility depends on skill locale; Amazon's documentation maps English (India) to Europe (Ireland), eu-west-1, while the allowed-region table may differ by locale. Consult [Amazon's current region guidance](https://developer.amazon.com/en-US/docs/alexa/custom-skills/host-a-custom-skill-as-an-aws-lambda-function.html).
+The updated handler requires the `IOT_ENDPOINT` environment variable and no longer falls back to an endpoint embedded in the source. Set it to the AWS IoT data endpoint for your own account. The value may be the bare hostname or start with `https://`; the code normalizes it. Alexa region compatibility depends on skill locale; Amazon's documentation maps English (India) to Europe (Ireland), eu-west-1, while the allowed-region table may differ by locale. Consult [Amazon's current region guidance](https://developer.amazon.com/en-US/docs/alexa/custom-skills/host-a-custom-skill-as-an-aws-lambda-function.html).
 
 ## AWS IoT certificate files for Home Assistant
 
