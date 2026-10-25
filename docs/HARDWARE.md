@@ -26,7 +26,7 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 | 1 | Status LED and current-limiting resistor | Firmware default is one active-LOW status output on GPIO2. The circuit drawing depicts a common-anode RGB LED and three GPIOs, which do not match the present firmware pin map. Choose one implementation after verifying code and hardware. |
 | 1 | Reset/programming arrangement | Use the reset and boot/program pins required by the ESP-12F carrier. The additional reset button shown in the diagram is not represented by a separate GPIO in the current firmware source. |
 | As needed | PCB/perfboard, headers, connectors, wire, insulation, mounting hardware | Exact PCB, connector and fastener part numbers were not included in the supplied files. |
-| 1 | 3D-printed enclosure | Use `Overkill.3mf` from the prepared release bundle. It is not yet committed to this GitHub branch; fit and screw dimensions require a test print. |
+| 1 | 3D-printed enclosure | Print the supplied `Overkill.3mf` in **PETG**. The model still needs a test print to validate fit, screw/insert dimensions and clearances. |
 
 ### Power and LED safety
 
@@ -94,12 +94,12 @@ Do not follow the original diagram blindly while the CS conflict is unresolved. 
 
 ## Print and fit the enclosure
 
-The project uses a supplied multi-object `Overkill.3mf` model. It is a slicer project/model, not proof of a tested print profile. The dimensions of the screws/inserts, material, layer height, infill, supports and print orientation have not been verified from a physical assembly.
+The project uses the supplied multi-object `Overkill.3mf` model. **Print the enclosure in PETG.** PETG is the specified project material for the enclosure. The model is not proof of a tested print profile, and the screw/insert dimensions and physical clearances have not yet been validated against an assembled unit. Use the filament manufacturer's recommended profile as the starting point; do not assume an untested universal temperature, fan or speed setting.
 
 1. Open `Overkill.3mf` in your slicer.
 2. Inspect the object list and colour/material assignments. Confirm all objects are positioned and enabled as intended.
 3. Review the preview for thin walls, unsupported features, holes and bridges. Orient parts to suit your printer and the visible surface finish.
-4. Use a material appropriate for the expected ambient temperature and your printer; choose the slicer's normal settings for that filament rather than copying unverified settings from this repository.
+4. Select PETG filament for the enclosure. Start with the filament manufacturer's PETG profile for your printer/nozzle, verify bed adhesion and layer bonding, and adjust only after inspecting the preview and a small test print. Exact temperatures, fan settings, speed and infill have not been validated for this model.
 5. Print a small fit-check or the parts with critical posts/holes first.
 6. Test-fit the ESP carrier, IR array, connectors and cables before printing the complete set. Check that the IR LEDs and receiver have an unobstructed optical path.
 7. Confirm screw lengths and clearances physically. Do not allow screws or conductive hardware to touch exposed circuit pads.
