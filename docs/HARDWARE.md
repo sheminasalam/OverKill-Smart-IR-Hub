@@ -2,7 +2,7 @@
 
 This page documents the actual build: a D1 mini development board, W25Q32 flash, USB-C 4-pin power breakout, IR receiver and transmitter, waterproof DS18B20 probe, one status LED, an underside reset button and a PETG enclosure. The original ESP-12F circuit drawing must be adapted for the D1 mini board labels.
 
-**Current connection diagram:** [Open the committed circuit diagram (PNG)](../hardware/circuit-diagram.png). It shows flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS = 3` constant. The intended pin mapping is therefore clear; the Stage Info serial diagnostic is stale and prints `GPIO15 -> W25Qxx CS`. GPIO3 is labelled RX on a D1 mini and is shared with UART0 RX, so the physical build still needs tests for flash read/write/erase, boot and serial programming before it can be called hardware-validated. The diagram uses ESP-12F GPIO names; apply the D1 mini label mapping in [PIN-MAP.md](../hardware/PIN-MAP.md).
+**Current connection diagram:** [Open the committed circuit diagram (PNG)](../hardware/circuit-diagram.png). It shows flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS = 3` constant. The Stage Info serial diagnostic has now been corrected to print `GPIO3 -> W25Qxx CS`. GPIO3 is labelled RX on a D1 mini and is shared with UART0 RX, so the physical build still needs tests for flash read/write/erase, boot and serial programming before it can be called hardware-validated. The diagram uses ESP-12F GPIO names; apply the D1 mini label mapping in [PIN-MAP.md](../hardware/PIN-MAP.md).
 
 ## Bill of materials (BOM)
 
