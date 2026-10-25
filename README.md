@@ -8,17 +8,17 @@
 
 ## The cost advantage
 
-The six major line items below add up to approximately **₹349** at the supplier prices listed when checked on **25 October 2026**:
+The six major line items below add up to approximately **₹317** at the supplier prices observed for this estimate on **25 October 2026**:
 
 | Major component | Listed price |
 |---|---:|
-| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | ₹175 |
+| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | ₹144 |
 | [W25Q32 4 MiB flash module](https://quartzcomponents.com/collections/all/products/w25q32-32mbit-capacity-flash-storage-module) | ₹57 |
 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/collections/all/products/ds18b20-water-proof-temperature-sensor) | ₹34 |
 | [12 × 940 nm IR LEDs](https://quartzcomponents.com/collections/ir-sensor) at ₹4.50 each | ₹54 |
-| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | ₹6 |
+| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | ₹5 |
 | [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | ₹23 |
-| **Subtotal for these six line items** | **₹349** |
+| **Subtotal for these six line items** | **₹317** |
 
 *This is a transparent reference subtotal, not the complete build cost or a guaranteed current quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V power supply/cable, PETG filament and print waste, tools, shipping, and any optional regulator. Supplier prices, availability and taxes may change. The author's D1 mini build already includes 3.3 V regulation; a bare ESP-12F variant needs an additional 5 V-to-3.3 V regulator.
 
