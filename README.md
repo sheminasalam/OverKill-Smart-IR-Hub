@@ -9,7 +9,7 @@ This repository is being prepared as a reproducible DIY build guide. Follow the 
 
 **Corrected connection diagram:** [Open the connection diagram (PNG)](hardware/OverKill-Connection-Diagram.png). It shows the ESP-12F pin names used by the firmware. A bare ESP-12F needs a suitable 5 V-to-3.3 V regulator; the author's D1 mini build already has onboard regulation. GPIO3 is also UART0 RX, so read the serial/flash-CS note in the diagram and [pin-map notes](hardware/PIN-MAP.md).
 
-![Corrected enclosure views with labeled openings and controls](hardware/OverKill-Enclosure-Views.png)
+![Corrected enclosure views with labeled openings and controls](hardware/Overkill_marketing_collage.png)
 
 **Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The SVG above is a visual reference, **not** the printable 3MF file.
 
