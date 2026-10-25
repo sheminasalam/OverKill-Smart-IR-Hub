@@ -42,7 +42,7 @@ No release binary is supplied in this repository at present because a reproducib
 7. Before learning anything, test a minimal IR transmission and receiver capture. The built hardware has **no physical learning button**: start learning from the Web UI and use the top-plate IR receiver to capture the original remote's signal.
 8. If serial output says storage is in RAM-only mode, do not expect learned devices to survive reset. Fix flash detection first.
 
-The source code currently uses GPIO3 as flash CS while the supplied diagram says GPIO15 (D8 on a typical D1 mini). GPIO3 is also D1 mini RX, which can complicate serial programming/debugging if it is tied to the flash. Resolve the physical CS wiring and align code plus schematic before interpreting failures as a bad flash chip.
+The compile-time source constant and current uploaded connection diagram both assign flash CS to GPIO3. However, the Stage Info diagnostic still prints `GPIO15 -> W25Qxx CS`; that diagnostic string is stale. GPIO3 is also D1 mini RX/UART0 RX, which can complicate serial programming/debugging when it is shared with flash CS. Verify the physical wiring and serial behaviour; correct the diagnostic output before release.
 
 ## Configure Wi-Fi and open the Web UI
 
