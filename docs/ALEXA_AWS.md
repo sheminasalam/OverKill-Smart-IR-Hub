@@ -139,22 +139,82 @@ Use resource ARNs scoped to the actual topics and region/account. Do not use adm
 4. Confirm the returned endpoints have unique IDs, human-readable friendly names and the expected categories.
 5. Test a harmless power/volume directive only after verifying the endpoint maps to the correct appliance. Never debug with a command that might accidentally switch the wrong device.
 
-## Configure Login with Amazon account linking
+## Connect the Smart Home skill, Lambda and account linking — three copy/paste steps
 
-**Account linking is required for an Alexa Smart Home skill.** It is separate from the AWS IoT mutual-TLS bridge certificate. The current codebase does not provide its own OAuth authorization server, so this guide follows Amazon's documented Login with Amazon (LWA) authorization-code configuration. Follow Amazon's current console labels if they change. Official references: [Smart Home account linking](https://developer.amazon.com/docs/alexaplus/account-linking/account-linking-for-sh-and-other.html), [LWA setup tutorial](https://developer.amazon.com/docs/alexaplus/smarthome/set-up-account-linking-tutorial.html).
+This setup involves **three separate console objects**:
 
-1. In the Amazon Developer Console, open **Login with Amazon** and create a security profile for this project. Record its Client ID and Client Secret privately. Do not put the secret in GitHub or in this README.
-2. Open the Smart Home skill in the Alexa Developer Console and go to **Account Linking** / **Setup Account Linking**.
-3. Select the **Authorization Code Grant** flow. Smart Home skills use the authorization-code grant, not the implicit grant.
-4. For the LWA provider fields, configure the Web Authorization URI as `https://www.amazon.com/ap/oa` and the Access Token URI as `https://api.amazon.com/auth/o2/token`.
-5. Paste the Client ID and Client Secret from the LWA security profile. Set the client authentication scheme to **HTTP Basic** (the option Amazon recommends in its tutorial).
-6. Add the `profile:user_id` scope. This identifies the linked Amazon user for the skill.
-7. Save the account-linking configuration and copy the Alexa Redirect URLs shown by the skill console.
-8. Return to the LWA security profile's **Web Settings** and add every redirect URL supplied by the Alexa console to **Allowed Return URLs**. Save the profile.
-9. Provide the skill's privacy policy URL if required by the console, save/build the skill, and enable it for testing.
-10. In the Alexa app, enable the development skill and select **Link Account**. Complete the Amazon sign-in and consent flow. Then run device discovery.
+1. **Alexa Smart Home skill** — created in the Alexa Developer Console.
+2. **AWS Lambda function** — runs `alexa_lambda/index.mjs`.
+3. **Login with Amazon (LWA) security profile** — supplies the client ID/secret used by the skill's account-linking settings.
 
-The Client ID/Secret in the LWA security profile are used by the account-linking OAuth configuration. They are different from the AWS IoT endpoint, the AWS Lambda execution role, and the X.509 client certificate used by Home Assistant.
+These are linked by copying a few console-generated values between pages. You do **not** need to search-and-replace user-specific values inside `index.mjs`. The Lambda's required environment setting is `IOT_ENDPOINT`; the skill ID, Lambda ARN and LWA credentials belong in the consoles described below.
+
+### Before you start: keep this value sheet
+
+Keep this in a private local text file while configuring the service. Fill in each value once, then copy it to the destination described in the three steps. Do not commit this file to GitHub.
+
+| Placeholder | Where to get it | Where to paste it |
+|---|---|---|
+| `AWS_REGION` | AWS region used for the IoT endpoint and Lambda. For the project's English (India) skill setup, use `eu-west-1`; if using another Alexa locale, follow Amazon's current region mapping. | AWS Lambda region selector and `IOT_REGION` if you set it explicitly. |
+| `IOT_ENDPOINT` | AWS IoT Core → Settings / device data endpoint. Copy your account's endpoint hostname. | AWS Lambda → Configuration → Environment variables → `IOT_ENDPOINT`. It may be the hostname or hostname prefixed with `https://`. |
+| `SKILL_ID` | Alexa Developer Console → your Smart Home skill → Smart Home service endpoint → **Skill ID**. It usually begins with `amzn1.ask.skill.`. | AWS Lambda → Add trigger → Alexa Smart Home → **Skill ID**. This is a trigger/permission setting, **not** a Lambda environment variable. |
+| `LAMBDA_ARN` | AWS Lambda → your function → Function overview → **ARN**. | Alexa Developer Console → Smart Home → **Smart Home service endpoint**. Paste it into Default endpoint and the regional endpoint for your skill's locale. |
+| `LWA_CLIENT_ID` | Login with Amazon → your security profile → Client ID. | Alexa Developer Console → Account Linking → Your Client ID. |
+| `LWA_CLIENT_SECRET` | Login with Amazon → same security profile → Client Secret. | Alexa Developer Console → Account Linking → Your Secret. Treat this as a password; don't put it in GitHub, the README, screenshots or Lambda environment variables. |
+| `ALEXA_REDIRECT_URLS` | Alexa Developer Console → Account Linking, after you save the configuration. Copy **every** redirect URL shown. | Login with Amazon → security profile → Web Settings → Allowed Return URLs. Add every URL exactly as shown. |
+
+Keep the AWS IoT X.509 certificate/private key separate from the LWA Client ID/Secret: they authenticate different connections and are not interchangeable.
+
+### Step 1 of 3 — Create the Alexa Smart Home skill and copy its ID
+
+1. Open the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask).
+2. Choose **Create Skill** and give it a name such as `OverKill Smart IR Hub`.
+3. Choose the intended primary locale. Select **Smart Home** as the experience/type and model, and choose the option that lets you provide your own hosting (wording may vary in the console).
+4. Create the skill.
+5. Open the **Smart Home** page and copy the **Skill ID** into your private value sheet as `SKILL_ID`. Do not type or guess this ID.
+6. Leave the Smart Home service endpoint page open—you will paste the Lambda ARN there in Step 2.
+
+### Step 2 of 3 — Connect the skill to your Lambda
+
+The Lambda package should already be deployed using the earlier section of this guide, with its IAM role and required environment variable `IOT_ENDPOINT` configured.
+
+1. In the [AWS Lambda Console](https://console.aws.amazon.com/lambda/), open your deployed OverKill Lambda. Confirm it is in the region that matches the chosen Alexa locale and AWS IoT endpoint. For the project's English (India) setup this is `eu-west-1`.
+2. Choose **Add trigger**, select **Alexa Smart Home** (not a custom Alexa Skills Kit trigger if the console offers separate trigger types), and paste the `SKILL_ID` from Step 1 into the **Skill ID** field. Save the trigger. This restricts invocation to the intended skill.
+3. Copy the function's **ARN** from Function overview into your private value sheet as `LAMBDA_ARN`. It looks similar to this example; your account ID and function name will differ:
+
+   ```text
+   arn:aws:lambda:eu-west-1:123456789012:function:OverKillSmartHome
+   ```
+
+   The example is a format illustration only—**do not use this example ARN**.
+4. Return to the Alexa Developer Console → your skill → **Smart Home** → **Smart Home service endpoint**.
+5. Paste your actual `LAMBDA_ARN` into **Default endpoint** and the endpoint for the region matching your skill's locale. When the skill uses only one region, Amazon's guidance is to use the same ARN for the default and selected regional endpoint.
+6. Save the skill. Recheck that the Lambda trigger uses the correct `SKILL_ID` and that the skill endpoint uses the correct `LAMBDA_ARN`. These values are related but are **not the same value**.
+
+### Step 3 of 3 — Configure Login with Amazon account linking
+
+Smart Home skills require account linking. The LWA security profile and the Smart Home skill are separate objects; this step connects them.
+
+1. In the [Login with Amazon console](https://developer.amazon.com/loginwithamazon), create a **Security Profile** for OverKill. Record its **Client ID** and **Client Secret** privately as `LWA_CLIENT_ID` and `LWA_CLIENT_SECRET`.
+2. Return to the Alexa Developer Console → your Smart Home skill → **Account Linking** → **Setup Account Linking**.
+3. Choose **Authorization Code Grant**.
+4. Enter these fixed LWA endpoints exactly:
+
+   ```text
+   Web Authorization URI: https://www.amazon.com/ap/oa
+   Access Token URI:      https://api.amazon.com/auth/o2/token
+   Authentication Scheme: HTTP Basic
+   Scope:                 profile:user_id
+   ```
+
+5. Paste `LWA_CLIENT_ID` into **Your Client ID** and `LWA_CLIENT_SECRET` into **Your Secret**. Save the configuration.
+6. On that same Account Linking page, find **Alexa Redirect URLs**. Copy every URL shown—not just the first—and keep them in your private value sheet.
+7. Return to Login with Amazon → your security profile → **Web Settings** → **Allowed Return URLs**. Add each Alexa Redirect URL exactly as copied, then save.
+8. Return to the Alexa Developer Console and confirm the Account Linking configuration is saved. Complete any privacy-policy or skill metadata requirements shown by the console.
+9. Open the Alexa app associated with the target household, enable the development skill, and complete **Link Account**. Then run **Discover Devices**.
+10. Confirm that only devices enabled for cloud exposure appear. Test a simple power command first, then volume/channel commands.
+
+Official instructions: [Create a Smart Home skill](https://developer.amazon.com/docs/alexaplus/smarthome/create-addon-tutorial), [configure the Lambda service endpoint](https://developer.amazon.com/docs/alexaplus/smarthome/implement-your-addon), and [set up Login with Amazon account linking](https://developer.amazon.com/docs/alexaplus/smarthome/set-up-account-linking-tutorial).
 
 ## Alexa Event Gateway permission is a separate feature
 
@@ -162,19 +222,15 @@ The repository's currently committed `alexa_lambda/index.mjs` reads only these e
 
 Therefore, do not enable **Send Alexa Events** / Event Gateway permission for this Lambda as currently committed. If the deployed Lambda has additional `ALEXA_EVENT_*` variables, that deployed source differs from the repository copy and must be reviewed and committed before documenting or relying on those variables. Amazon requires a separate OAuth exchange, secure per-customer token storage and refresh handling when proactive Alexa events are enabled. See [Request access to the Alexa Event Gateway](https://developer.amazon.com/docs/alexaplus/smarthome/authenticate-a-customer-permissions.html) and [Send events to the Alexa Event Gateway](https://developer.amazon.com/docs/alexaplus/smarthome/send-events-to-the-alexa-event-gateway.html).
 
-## Create and link the Alexa Smart Home skill
+## Test Alexa discovery and commands
 
-1. Open the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) and create a **Smart Home** skill.
-2. Choose the intended locale. For English (India), use the documented Europe (Ireland) Lambda endpoint region, `eu-west-1`; region selection depends on the Alexa account locale, not just your physical location.
-3. Configure the Smart Home skill's Lambda endpoint with the ARN of the deployed function in the correct region.
-4. Save the skill configuration and ensure the Lambda resource policy allows invocation by the Alexa Smart Home service as instructed by the console.
-5. Use the console's test page with the skill enabled for testing. Complete the required account-linking configuration described in the preceding section. The deployed Lambda is not the OAuth authorization server; Login with Amazon handles that authorization-code flow.
-6. Open the Alexa app associated with the target household and run **Discover Devices**.
-7. Confirm that only the devices marked for cloud exposure appear and that each device has the intended name.
-8. Try power, volume and channel commands with an appliance where the IR output can be observed.
-9. If a device was renamed or its exposure changed, run discovery again. If Alexa retains an old endpoint/name, remove the stale device from the Alexa app if available and rediscover.
+The Lambda uses the retained device catalogue, not a hard-coded list of appliances. If the catalogue is empty or invalid, Alexa discovery will not return the devices you expect.
 
-The Lambda uses a retained catalogue, not a hard-coded list of appliances. When no valid catalogue is available, it has no hard-coded fallback; discovery will return no useful device list until the bridge/catalogue is healthy.
+1. In AWS IoT / the Home Assistant bridge, confirm a retained JSON array exists at `alexa/config/devices`.
+2. In AWS Lambda, use the test console with an Alexa Smart Home **Discover** event and review the function logs.
+3. In the Alexa app, run **Discover Devices** after account linking completes.
+4. Confirm each expected device appears with the intended friendly name and type.
+5. Test power first. If it fails, follow the path in order: Lambda logs → AWS IoT directive topic → Home Assistant bridge logs → hub MQTT/serial logs → physical IR output.
 
 ### Device IDs and TV channels
 
