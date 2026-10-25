@@ -17,7 +17,7 @@ The project combines a compact, PETG-printed enclosure with a browser-based setu
 
 This is a DIY build, not a plug-and-play retail product. You should expect to source the components, assemble and test the electronics, print the enclosure in PETG, flash the firmware and configure the local MQTT/Home Assistant path. Alexa voice control adds separate Amazon/AWS account and cloud setup, and requires an internet connection. The hub's local Web UI and local MQTT/Home Assistant path are intended for local control; Alexa's cloud voice path is not fully local.
 
-The author's physical build uses a **D1 mini ESP8266 development board**, which already includes 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. Before constructing a board from the older schematic, read the pin-map warning below: the external flash chip-select assignment still needs to be reconciled between the firmware and the original diagram.
+The author's physical build uses a **D1 mini ESP8266 development board**, which already includes 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. Before assembly, read the pin-map warning below: the compile-time flash-CS setting and current connection image both use GPIO3, but the firmware's Stage Info diagnostic still prints GPIO15 for flash CS. GPIO3 is also UART0 RX, so serial input/programming needs to be tested on the actual D1 mini.
 
 ## Indicative component cost
 
@@ -29,7 +29,7 @@ As a rough reference, six major component line items total about **US$3.34**, co
 | [W25Q32 4 MiB flash module](https://quartzcomponents.com/collections/all/products/w25q32-32mbit-capacity-flash-storage-module) | $0.60 |
 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/collections/all/products/ds18b20-water-proof-temperature-sensor) | $0.36 |
 | [12 × 940 nm IR LEDs](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led) | $0.57 |
-| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | $0.06 |
+| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | $0.05 |
 | [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | $0.24 |
 | **Subtotal for these six line items** | **$3.34** |
 
@@ -38,7 +38,7 @@ As a rough reference, six major component line items total about **US$3.34**, co
 The sections below walk through the hardware, firmware, Home Assistant integration, AWS IoT certificates and Alexa setup in detail.
 
 > [!CAUTION]
-> **Use the corrected connection diagram below.** It shows W25Q32 flash CS on GPIO3 to match the firmware constants; GPIO3 is also UART0 RX, so the diagram notes the serial-console limitation and cautions against remapping the pin. The enclosure image identifies the three top openings, USB-C 5 V input provision, and underside reset pinhole. The hardware has one status LED and no physical learning button; learning is started from the Web UI using the IR receiver. See the [pin-map notes](hardware/PIN-MAP.md).
+> **Use the current connection diagram below.** It shows W25Q32 flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS` constant. However, the firmware's Stage Info output still says GPIO15 for flash CS; that diagnostic string is stale. GPIO3 is also UART0 RX, so serial input/programming needs physical verification before release. The enclosure image identifies the three top openings, USB-C 5 V input provision, and underside reset pinhole. The hardware has one status LED and no physical learning button; learning is started from the Web UI using the IR receiver. See the [pin-map notes](hardware/PIN-MAP.md).
 
 **Connection diagram:** [Open the connection diagram (PNG)](hardware/circuit-diagram.png). It shows the ESP-12F pin names used by the firmware. A bare ESP-12F needs a suitable 5 V-to-3.3 V regulator; the author's D1 mini build already has onboard regulation. GPIO3 is also UART0 RX, so read the serial/flash-CS note in the diagram and [pin-map notes](hardware/PIN-MAP.md).
 
@@ -73,7 +73,7 @@ The supplied Lambda uses the retained device catalogue at `alexa/config/devices`
 
 The firmware sources, updated Lambda, documentation, corrected connection diagram and enclosure feature views are committed. The original 3MF is at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The connection diagram and labeled enclosure image are visual references; they do not replace the 3MF printable model. GPIO3 is shared by flash CS and UART0 RX in the current firmware, as documented in the diagram. The companion Home Assistant integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
 
-The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on the verified flash-CS connection, matching schematic and successful hardware tests.
+The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on confirming flash-CS wiring and serial behaviour on the actual D1 mini, correcting the stale Stage Info GPIO15 diagnostic, and completing hardware tests.
 
 ## Current Lambda source
 
