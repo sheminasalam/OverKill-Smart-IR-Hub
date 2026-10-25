@@ -8,7 +8,7 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 
 | Qty. | Component | Use / selection notes |
 |---:|---|---|
-| 1 | ESP8266 ESP-12F module | Main controller. Use a carrier/adapter that exposes the required GPIOs and permits programming. Confirm the exact module's flash capacity and pinout. |
+| 1 | **D1 mini ESP8266 development board** | **Used in this build.** It includes an onboard 3.3 V regulator and USB/programming circuitry. The ESP-12F in the original diagram refers to the module-level pinout; use the D1 mini GPIO-to-D-pin mapping below when wiring the D1 mini. | Main controller. Use a carrier/adapter that exposes the required GPIOs and permits programming. Confirm the exact module's flash capacity and pinout. |
 | 1 | [W25Q32 32-Mbit SPI flash module](https://quartzcomponents.com/products/w25q32-32mbit-capacity-flash-storage-module?variant=44978575376618) | Exact module used. 32 Mbit = 4 MiB. Supplier lists SPI, 2.7–3.6 V operation and 100,000 program/erase cycles. Power it from 3.3 V, not 5 V, and confirm the breakout pin labels. |
 | 1 | KY-022 IR receiver module or compatible demodulating 940 nm receiver | Receives IR from original remotes. Use the labels on the actual module to identify OUT, VCC and GND; do not assume a universal physical pin order. |
 | 12 | [L518EIR1BC1-S61 940-nm, 5-mm IR transmitter LED](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led?variant=46154073506026) | Exact LED used. The seller identifies it as a 940-nm 5-mm IR emitter. Use 12 total in six branches of two series LEDs as drawn, but do not assume the 30 Ω resistor is validated until the exact part datasheet/current limits are checked. |
@@ -16,17 +16,17 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 | 6 | 30 Ω, 1/4 W resistors (as drawn) | One in series with each two-LED branch. **Treat this as the value in the supplied drawing, not an electrically validated value.** Calculate branch current and resistor dissipation for the actual LEDs and supply before assembly. |
 | 1 | 100 Ω resistor | Gate series resistor shown between ESP GPIO4 and MOSFET gate. |
 | 1 | 10 kΩ resistor | Gate-to-GND pulldown shown in the driver drawing; helps keep the MOSFET off during reset/boot. |
-| 1 | 5 V regulated DC supply | Drawing recommends ≥2 A. Confirm capacity against the array's measured peak load and the ESP regulator input. |
-| 1 | AMS1117-3.3 regulator or correctly rated 3.3 V regulator module | 5 V to 3.3 V supply for ESP8266/peripherals. Check regulator heat, dropout, current and transient response in the real circuit. |
+| 1 | **USB-C 4-pin female breakout board** ([Quartz Components](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board)) | Used for the enclosure's side power inlet. Its pins are VBUS (+5 V), GND, D+ and D−; use VBUS/GND for power and leave D+/D− unconnected. It is a power connector board, not a USB data/programming interface. |\n| 1 | Regulated 5 V USB supply | Supplies 5 V through the USB-C breakout. Use a supply/cable with adequate capacity for the ESP8266 and IR array. This 4-pin board does not break out CC pins; use a USB-A-to-USB-C cable unless you have verified a compatible USB-C source/cable arrangement. | Drawing recommends ≥2 A. Confirm capacity against the array's measured peak load and the ESP regulator input. |
+| 1 (bare-module option only) | [AMS1117-3.3 800 mA LDO module](https://quartzcomponents.com/collections/all/products/ams1117-3-3-ldo-800ma-dc-5v-to-3-3v-step-down-power-supply-module) | Not needed for this D1 mini build because the D1 mini includes a 3.3 V regulator. For a bare ESP-12F without an onboard regulator, connect 5 V to IN, GND to common ground, and OUT to the regulated 3.3 V rail. The listed 800 mA is a headline rating; actual usable current depends on thermal dissipation and layout. Never feed 5 V into ESP-12F VCC/3V3. | 5 V to 3.3 V supply for ESP8266/peripherals. Check regulator heat, dropout, current and transient response in the real circuit. |
 | 1 | 10 µF capacitor | 5 V input decoupling shown in the diagram. |
 | 1 | 10 µF capacitor | 3.3 V rail bulk decoupling shown in the diagram. |
 | 1 | 100 nF capacitor | 3.3 V high-frequency decoupling shown in the diagram. Place close to the ESP/peripheral supply pins where practical. |
 | 1 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/products/ds18b20-water-proof-temperature-sensor?variant=31898050953351) | Exact sensor used. Three-wire 1-Wire digital probe; firmware default data pin is GPIO16. Add the 4.7 kΩ pull-up from DATA to 3.3 V shown in the circuit. Confirm the wire colours against the supplied probe/measurement before connecting. |
 | 1 | 4.7 kΩ resistor | DS18B20 data pull-up to 3.3 V, if using the sensor as drawn. |
-| 1 | Status LED and current-limiting resistor | Firmware default is one active-LOW status output on GPIO2. The circuit drawing depicts a common-anode RGB LED and three GPIOs, which do not match the present firmware pin map. Choose one implementation after verifying code and hardware. |
-| 1 | Reset/programming arrangement | Use the reset and boot/program pins required by the ESP-12F carrier. The additional reset button shown in the diagram is not represented by a separate GPIO in the current firmware source. |
-| As needed | PCB/perfboard, headers, connectors, wire, insulation, mounting hardware | Exact PCB, connector and fastener part numbers were not included in the supplied files. |
-| 1 | 3D-printed enclosure | Print the supplied `Overkill.3mf` in **PETG**. The original 3MF is not yet committed to this repository; the linked SVG is a preview, not a printable substitute. The model needs a test print to validate fit, screw/insert dimensions and clearances. |
+| 1 | Status LED and current-limiting resistor | The actual enclosure has a top-plate opening for the single status LED. Firmware default output is GPIO2, active LOW. The RGB indicator shown in the old diagram does not match the physical build described by the author. | Firmware default is one active-LOW status output on GPIO2. The circuit drawing depicts a common-anode RGB LED and three GPIOs, which do not match the present firmware pin map. Choose one implementation after verifying code and hardware. |
+| 1 | Physical reset button | Located underneath the assembled device and connected to the D1 mini RST/reset input. It resets the board; it is not a learning button. | Use the reset and boot/program pins required by the ESP-12F carrier. The additional reset button shown in the diagram is not represented by a separate GPIO in the current firmware source. |
+| As needed | Headers, wire, insulation and mounting hardware | The 3MF includes a provision for the 4-pin USB-C breakout PCB. Test-fit it before soldering; exact fasteners/inserts still need physical confirmation. | Exact PCB, connector and fastener part numbers were not included in the supplied files. |
+| 1 | 3D-printed enclosure | [The original `Overkill.3mf` is in this repository](../3d_printing/Overkill.3mf). Print it in **PETG**. The top plate has apertures for the temperature probe, IR receiver and status LED; the side provision holds the USB-C power breakout; the reset button is underneath. | Print the supplied `Overkill.3mf` in **PETG**. The original 3MF is not yet committed to this repository; the linked SVG is a preview, not a printable substitute. The model needs a test print to validate fit, screw/insert dimensions and clearances. |
 
 ### Power and LED safety
 
@@ -51,6 +51,10 @@ The supplier product pages are the procurement references. For electrical design
 
 ## Confirm the pin map before assembly
 
+### D1 mini board aliases
+
+The firmware uses raw ESP8266 GPIO numbers. On a typical D1 mini these correspond to board labels as follows: GPIO2 = D4, GPIO3 = RX, GPIO4 = D2, GPIO5 = D1, GPIO12 = D6, GPIO13 = D7, GPIO14 = D5 and GPIO16 = D0. Check the silkscreen on your particular board before wiring.
+
 The following are the current defaults in `firmware/OverKill-v1.ino`. They are not a substitute for verifying the flash-CS connection on the actual board.
 
 | Function | Current source setting | Notes |
@@ -63,7 +67,7 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 | IR RX | GPIO5 default | Can be changed in the Web UI's Hub configuration; confirm the resulting pin allocation. |
 | Status LED | GPIO2 default, active LOW | Firmware uses a single status indicator. |
 | DS18B20 data | GPIO16 default | Optional; can be changed in Hub configuration. |
-| Learn button | GPIO0 declared | Current source reports the physical learn button is disabled because GPIO0 is a boot-strap pin. Use the Web UI to learn commands. |
+| Physical learn button | **None** | There is no physical learning button. Learning is initiated from the Web UI and signals are received by the IR receiver. Do not add a learn button to GPIO0. |
 | UART0 TX/RX | GPIO1 / GPIO3 | Used for serial upload/debugging. GPIO3's use as flash CS in the current source requires special attention. |
 
 **Do this now, before fabricating or powering the final assembly:**
@@ -98,15 +102,15 @@ Do not follow the original diagram blindly while the CS conflict is unresolved. 
 
 The image labels the outer parts/features present in the model. It does not show the electronics.
 
-The project uses the supplied multi-object `Overkill.3mf` model. **Print the enclosure in PETG.** PETG is the specified project material for the enclosure. The model is not proof of a tested print profile, and the screw/insert dimensions and physical clearances have not yet been validated against an assembled unit. Use the filament manufacturer's recommended profile as the starting point; do not assume an untested universal temperature, fan or speed setting.
+The project uses the committed multi-object [`Overkill.3mf`](../3d_printing/Overkill.3mf). **Print the enclosure in PETG.** The model includes provisions for the USB-C breakout board and the top-plate openings for the DS18B20 probe, IR receiver and status LED. The reset button is accessed underneath the device. Use the filament manufacturer's recommended PETG profile as the starting point; exact temperatures, fan settings, speed, infill and orientation have not been validated for this model.
 
-1. Open `Overkill.3mf` in your slicer.
+1. Open [`3d_printing/Overkill.3mf`](../3d_printing/Overkill.3mf) in your slicer.
 2. Inspect the object list and colour/material assignments. Confirm all objects are positioned and enabled as intended.
 3. Review the preview for thin walls, unsupported features, holes and bridges. Orient parts to suit your printer and the visible surface finish.
 4. Select PETG filament for the enclosure. Start with the filament manufacturer's PETG profile for your printer/nozzle, verify bed adhesion and layer bonding, and adjust only after inspecting the preview and a small test print. Exact temperatures, fan settings, speed and infill have not been validated for this model.
 5. Print a small fit-check or the parts with critical posts/holes first.
 6. Test-fit the ESP carrier, IR array, connectors and cables before printing the complete set. Check that the IR LEDs and receiver have an unobstructed optical path.
-7. Confirm screw lengths and clearances physically. Do not allow screws or conductive hardware to touch exposed circuit pads.
+7. Confirm reset-button access from the underside, top-plate sensor/receiver/LED clearances, screw lengths and board clearance physically. Do not allow screws or conductive hardware to touch exposed circuit pads.
 8. Record the validated material, slicer version/settings, hardware and any print orientation changes in the repository before calling the enclosure instructions final.
 
 
