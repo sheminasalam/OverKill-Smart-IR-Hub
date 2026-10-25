@@ -44,7 +44,7 @@ No release binary is supplied in this repository at present because a reproducib
 7. Before learning anything, test a minimal IR transmission and receiver capture. The built hardware has **no physical learning button**: start learning from the Web UI and use the top-plate IR receiver to capture the original remote's signal.
 8. If serial output says storage is in RAM-only mode, do not expect learned devices to survive reset. Fix flash detection first.
 
-The compile-time source constant and current uploaded connection diagram both assign flash CS to GPIO3. However, the Stage Info diagnostic still prints `GPIO15 -> W25Qxx CS`; that diagnostic string is stale. GPIO3 is also D1 mini RX/UART0 RX, which can complicate serial programming/debugging when it is shared with flash CS. Verify the physical wiring and serial behaviour; correct the diagnostic output before release.
+The compile-time source constant, corrected Stage Info diagnostic and committed connection diagram all assign flash CS to GPIO3. GPIO3 is also D1 mini RX/UART0 RX, which can complicate serial programming/debugging when shared with flash CS. Verify the physical wiring, flash read/write/erase, data persistence, boot and serial-programming behaviour on the actual D1 mini before treating the hardware as validated.
 
 ## Configure Wi-Fi and open the Web UI
 
@@ -131,16 +131,16 @@ For cloud Alexa, ensure each intended device is marked for cloud exposure in its
 
 ## Board/core version and flash setting
 
-The repository does not yet pin a fully reproducible Arduino build profile. These are the settings supported by the current source and documentation, distinguished from those still needing a real build/board check:
+The repository does not yet pin a fully reproducible Arduino build profile. These are the values known from source and documentation, distinguished from those still requiring a successful target-board build:
 
 | Build item | Current value/status |
 |---|---|
 | Physical board | D1 mini ESP8266 development board |
-| Arduino board profile to select | `LOLIN(WEMOS) D1 R2 & mini` (verify that this is the exact profile used by your installed ESP8266 core) |
-| External persistent storage | W25Q32 32-Mbit SPI flash module, **4 MiB**. This is separate from the ESP8266 module's internal flash. |
-| IRremoteESP8266 library | **2.9.0 exactly**; the source enforces this version |
-| ESP8266 Arduino core | **Not recorded/pinned yet** |
-| ESP8266 internal flash size and flash layout / OTA setting | **Not recorded or verified for the actual D1 mini**; these settings depend on the module fitted and must not be inferred from the external W25Q32 |
+| Suggested Arduino board profile | `LOLIN(WEMOS) D1 R2 & mini`; confirm this is the profile used for a successful release build |
+| External persistent storage | W25Q32 32-Mbit SPI flash, **4 MiB**; separate from the ESP8266 internal flash |
+| IRremoteESP8266 library | **2.9.0 exactly**, enforced by source |
+| ESP8266 Arduino core version | **Not recorded/pinned yet** |
+| ESP8266 internal flash size and layout / OTA setting | **Not measured/recorded for the physical D1 mini** |
 | PubSubClient version, CPU frequency, flash mode and upload speed | **Not recorded/pinned yet** |
 
-Before publishing a firmware binary as reproducible, build against a documented core version and record the actual board profile, module/internal-flash size and Tools settings from a successful compile/flash on the target hardware. The repository currently supplies source rather than a verified precompiled binary. Do not fill the unknown fields with assumed default values.
+Do not infer the ESP8266 module's internal flash capacity from the separate W25Q32 storage chip. Before publishing a firmware binary as reproducible, record the core version and actual Arduino Tools settings from a successful build and flash on the target board. This repository currently supplies source, not a verified precompiled binary.
