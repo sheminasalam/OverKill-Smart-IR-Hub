@@ -2,8 +2,9 @@
 
 ## Hardware blockers
 
-- [ ] Resolve PIN_FLASH_CS = GPIO3 vs Stage Info and diagram GPIO15. Validate on physical hardware and update firmware plus schematic together.
-- [ ] Decide if the RGB LED and separate reset button are present in the final board; the current firmware map does not implement the depicted RGB channel pins.
+- [ ] Correct the firmware Stage Info diagnostic from `GPIO15 -> W25Qxx CS` to GPIO3, matching `PIN_FLASH_CS = 3` and the current connection diagram.
+- [ ] Verify the physical W25Q32 CS wire is on D1 mini GPIO3/RX and test boot, flash read/write/erase, persistence, and serial-programming/debug behaviour with this shared pin.
+- [ ] Confirm the physical assembly matches the uploaded enclosure image: three top openings (DS18B20, IR receiver, single status LED), side USB-C power breakout, underside reset button, and no physical learning button.
 - [ ] Verify IR LED pulse/average current and resistor/MOSFET/LED thermal ratings from exact part datasheets.
 - [ ] Validate external flash ID, erase, write/read-back and persistence after power-cycle.
 
