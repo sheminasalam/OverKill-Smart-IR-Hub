@@ -31,7 +31,8 @@
 <g>
  <rect x="35" y="170" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
  <circle cx="64" cy="199" r="19" fill="#174a7a"/><text class="num" x="64" y="205">01</text>
- <text class="labelTitle" x="91" y="199">Top-plate openings</text><text class="labelSub" x="91" y="226">Temperature probe (DS18B20)</text><text class="labelSub" x="91" y="247">IR receiver for learning + status LED</text>
+ <text class="labelTitle" x="91" y="199">Top-plate openings</text><text class="labelSub" x="91" y="226">Temperature probe (DS18B20)</text><text class="labelSub" x="91" y="247">IR receiver (learning)</text>
+ <text class="labelSub" x="91" y="263">Status LED opening</text>
  <rect x="1230" y="225" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
  <circle cx="1259" cy="254" r="19" fill="#174a7a"/><text class="num" x="1259" y="260">02</text>
  <text class="labelTitle" x="1286" y="254">USB-C 5 V power inlet</text><text class="labelSub" x="1286" y="281">4-pin breakout PCB provision</text><text class="labelSub" x="1286" y="302">VBUS/GND supply input</text>
@@ -40,7 +41,7 @@
  <text class="labelTitle" x="1286" y="384">Main enclosure shell</text><text class="labelSub" x="1286" y="411">D1 mini is used in the author's build</text><text class="labelSub" x="1286" y="432">Bare ESP-12F needs 3.3 V regulation</text>
  <rect x="1230" y="485" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
  <circle cx="1259" cy="514" r="19" fill="#174a7a"/><text class="num" x="1259" y="520">04</text>
- <text class="labelTitle" x="1286" y="514">USB-C breakout mount</text><text class="labelSub" x="1286" y="541">Side-wall provision for the PCB</text><text class="labelSub" x="1286" y="562">Use USB-A to USB-C unless CC wiring is added</text>
+ <text class="labelTitle" x="1286" y="514">USB-C breakout mount</text><text class="labelSub" x="1286" y="541">Side-wall provision for the PCB</text><text class="labelSub" x="1286" y="562">USB-A source + A-to-C cable</text>
  <rect x="35" y="570" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
  <circle cx="64" cy="599" r="19" fill="#174a7a"/><text class="num" x="64" y="605">05</text>
  <text class="labelTitle" x="91" y="599">IR learning</text><text class="labelSub" x="91" y="626">Start learning from the Web UI</text><text class="labelSub" x="91" y="647">Receiver captures the original remote</text>
