@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f8fd"/><stop offset="1" stop-color="#e3eaf5"/></linearGradient>
+ <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111c2f"/><stop offset="1" stop-color="#2d3c58"/></linearGradient>
+ <style>
+ .labelTitle{font:700 17px Arial,sans-serif;fill:#173a65}.labelSub{font:14px Arial,sans-serif;fill:#4d5d74}
+ .num{font:700 16px Arial,sans-serif;fill:#fff;text-anchor:middle}
+ .line{fill:none;stroke:#16a4e8;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+ </style>
+</defs>
+<rect width="1600" height="1050" fill="url(#bg)"/>
+<rect x="35" y="24" width="1530" height="92" rx="20" fill="#103b69"/>
+<text x="68" y="63" fill="#fff" font-family="Arial,sans-serif" font-size="32" font-weight="700">OVERKILL SMART IR HUB</text>
+<text x="70" y="94" fill="#dbe9ff" font-family="Arial,sans-serif" font-size="18">Labeled exterior components from the supplied Overkill.3mf model</text>
+<rect x="1498" y="46" width="36" height="36" rx="18" fill="#2c77b8"/><text x="1516" y="69" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">3D</text>
+<rect x="408" y="130" width="784" height="795" rx="24" fill="url(#panel)" stroke="#7186a6" stroke-width="2"/>
+<image x="450" y="172" width="700" height="700" preserveAspectRatio="xMidYMid meet" href="data:image/jpeg;base64,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"/>
+<!-- callout leaders -->
+<path class="line" d="M370 220 L425 220 L425 245 L800 305"/>
+<path class="line" d="M1230 275 L1185 275 L1185 302 L790 325"/>
+<path class="line" d="M1230 405 L1190 405 L1190 448 L756 485"/>
+<path class="line" d="M1230 535 L1180 535 L1180 430 L878 395"/>
+<path class="line" d="M370 620 L422 620 L422 610 L742 590"/>
+<path class="line" d="M1230 665 L1187 665 L1187 640 L800 640"/>
+<path class="line" d="M1230 815 L1184 815 L1184 780 L742 735"/>
+<!-- anchor dots -->
+<g fill="#087db8" stroke="#fff" stroke-width="3">
+ <circle cx="800" cy="305" r="8"/><circle cx="790" cy="325" r="8"/><circle cx="756" cy="485" r="8"/><circle cx="878" cy="395" r="8"/><circle cx="742" cy="590" r="8"/><circle cx="800" cy="640" r="8"/><circle cx="742" cy="735" r="8"/>
+</g>
+<!-- label cards -->
+<g>
+ <rect x="35" y="170" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="64" cy="199" r="19" fill="#174a7a"/><text class="num" x="64" y="205">01</text>
+ <text class="labelTitle" x="91" y="199">Top cap / cover</text><text class="labelSub" x="91" y="226">Separate upper enclosure part</text><text class="labelSub" x="91" y="247">Shown in blue in the model</text>
+ <rect x="1230" y="225" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="1259" cy="254" r="19" fill="#174a7a"/><text class="num" x="1259" y="260">02</text>
+ <text class="labelTitle" x="1286" y="254">Top fixing features</text><text class="labelSub" x="1286" y="281">Holes / recesses in the cap</text><text class="labelSub" x="1286" y="302">Check fit against your hardware</text>
+ <rect x="1230" y="355" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="1259" cy="384" r="19" fill="#174a7a"/><text class="num" x="1259" y="390">03</text>
+ <text class="labelTitle" x="1286" y="384">Main enclosure shell</text><text class="labelSub" x="1286" y="411">Dark outer housing</text><text class="labelSub" x="1286" y="432">Electronics are not shown</text>
+ <rect x="1230" y="485" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="1259" cy="514" r="19" fill="#174a7a"/><text class="num" x="1259" y="520">04</text>
+ <text class="labelTitle" x="1286" y="514">Side apertures</text><text class="labelSub" x="1286" y="541">Openings through the shell</text><text class="labelSub" x="1286" y="562">Purpose depends on final assembly</text>
+ <rect x="35" y="570" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="64" cy="599" r="19" fill="#174a7a"/><text class="num" x="64" y="605">05</text>
+ <text class="labelTitle" x="91" y="599">Front recessed feature</text><text class="labelSub" x="91" y="626">Raised / recessed detail</text><text class="labelSub" x="91" y="647">Shape labelled, function not inferred</text>
+ <rect x="1230" y="615" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="1259" cy="644" r="19" fill="#174a7a"/><text class="num" x="1259" y="650">06</text>
+ <text class="labelTitle" x="1286" y="644">Lower collar / band</text><text class="labelSub" x="1286" y="671">Blue trim around the base</text><text class="labelSub" x="1286" y="692">Separate model object</text>
+ <rect x="1230" y="765" width="335" height="100" rx="15" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+ <circle cx="1259" cy="794" r="19" fill="#174a7a"/><text class="num" x="1259" y="800">07</text>
+ <text class="labelTitle" x="1286" y="794">Feet / supports</text><text class="labelSub" x="1286" y="821">Lower enclosure supports</text><text class="labelSub" x="1286" y="842">Test clearance on the print</text>
+</g>
+<rect x="35" y="952" width="1530" height="63" rx="14" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
+<text x="60" y="978" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#173a65">IMPORTANT</text>
+<text x="170" y="978" font-family="Arial,sans-serif" font-size="15" fill="#354b65">This 3MF contains enclosure geometry only. ESP8266, flash module, IR receiver, IR LEDs, wiring and PCB are not included in the model render.</text>
+<text x="60" y="1000" font-family="Arial,sans-serif" font-size="14" fill="#4d5d74">Print the enclosure in PETG. Confirm dimensions, hardware fit and the optical openings on a test print before final assembly.</text>
+</svg>
