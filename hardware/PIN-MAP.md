@@ -13,11 +13,11 @@ The physical build uses a **D1 mini ESP8266 development board**. The current upl
 | GPIO14 | D5 | W25Q32 SCLK |
 | GPIO16 | D0 | DS18B20 temperature data default |
 | RST | RST | Physical reset button under the enclosure |
-| None | — | There is no physical learning button or supported learn-button control. Start learning from the Web UI and use the IR receiver to capture the original remote's signal. GPIO0 appears only in a legacy input initialization; no physical learn button should be wired there. |
+| None | — | No physical learning button and no learn-button GPIO are used. Start learning from the Web UI and use the IR receiver to capture the original remote's signal. GPIO0 remains an ESP8266 boot-strap pin, not a user control. |
 
 ## Flash CS and serial diagnostic mismatch
 
-The current circuit diagram assigns W25Q32 CS to GPIO3, matching the compile-time constant `PIN_FLASH_CS = 3` in `firmware/OverKill-v1.ino`. The Stage Info diagnostic still prints `GPIO15 -> W25Qxx CS`; that is a stale log label, not the source's configured CS pin.
+The current circuit diagram assigns W25Q32 CS to GPIO3, matching the compile-time constant `PIN_FLASH_CS = 3` in `firmware/OverKill-v1.ino`. The Stage Info diagnostic has been corrected to report `GPIO3 -> W25Qxx CS`, consistent with the source pin constant and diagram.
 
 GPIO3 is also UART0 RX / D1 mini RX. The intended mapping is documented, but the repository cannot prove how a physical board has been wired. On the actual D1 mini, test flash JEDEC detection/read/write/erase, data persistence across power cycles, boot stability and the serial programming/debug workflow. Do not remap the pin or redraw the diagram unless the physical build and firmware are changed together.
 
