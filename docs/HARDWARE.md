@@ -1,6 +1,6 @@
 # Hardware, BOM, assembly and enclosure
 
-This page is the step-by-step physical build guide. Start with the caution below and resolve the pin conflict against the actual assembled board before creating or powering a final build.
+This page documents the actual build: a D1 mini development board, W25Q32 flash, USB-C 4-pin power breakout, IR receiver and transmitter, waterproof DS18B20 probe, one status LED, an underside reset button and a PETG enclosure. The original ESP-12F circuit drawing must be adapted for the D1 mini board labels.
 
 ## Bill of materials (BOM)
 
@@ -36,7 +36,7 @@ This table reflects the components used in the author's build. The main controll
 3. Do not drive the LED array directly from an ESP8266 GPIO.
 4. Calculate each branch current from the actual supply's maximum voltage, both LEDs' forward-voltage range, the resistor tolerance and temperature. Check resistor power, LED pulse limits and MOSFET limits at the intended transmit duty cycle.
 5. Test one LED branch first. Check current and temperature before populating or enabling all six branches.
-6. Do not run the ESP8266 and all twelve IR LEDs through a small 3.3 V regulator. Use a correctly sized 5 V source and an appropriate 3.3 V regulator for the logic.
+6. Power the IR LED array directly from the regulated 5 V rail through its MOSFET/resistor branches. In the author's D1 mini build, the D1 mini's onboard regulator supplies 3.3 V logic. If using a bare ESP-12F without a regulator, use the AMS1117 module (or another adequately rated regulator) from 5 V to 3.3 V; never use this 3.3 V rail to power the IR array.
 7. Disconnect power before continuity checks and before changing any SPI/GPIO wiring.
 
 ### Exact parts used in this build
@@ -86,16 +86,16 @@ The actual firmware constant is the code's behaviour; the fact that a drawing la
 
 Do not follow the original diagram blindly while the CS conflict is unresolved. Once the final CS decision is settled, use the following sequence to reduce debugging complexity.
 
-1. **Prepare the ESP supply.** With the ESP disconnected, apply 5 V to the regulator input and check the output against the module's 3.3 V requirement. Check regulator and capacitor polarity.
+1. **Prepare the 5 V input.** Solder/connect the 4-pin USB-C breakout in its enclosure provision. Wire VBUS to the 5 V input and GND to common ground; leave D+/D− unconnected for power-only operation. The breakout has no CC1/CC2 pins, so use a USB-A source with a USB-A-to-USB-C cable unless you add and validate the proper USB-C CC pull-down arrangement. For the D1 mini build, feed 5 V to its 5V input pin and let its onboard regulator produce 3.3 V. For a bare ESP-12F build, connect 5 V to the AMS1117 module input and use its 3.3 V output for the ESP/peripherals.
 2. **Verify grounds.** Confirm continuity among ESP GND, flash GND, IR receiver GND, MOSFET source/ground and the 5 V LED supply ground.
 3. **Install external flash.** Connect VCC to 3.3 V, GND to GND, MISO to GPIO12, MOSI to GPIO13 and SCLK to GPIO14. Connect CS only after resolving the GPIO conflict above. Do not power a 3.3 V flash module from 5 V.
 4. **Inspect for shorts.** Measure between 3.3 V and GND and between 5 V and GND before attaching the ESP. Investigate any near-short before power-on.
 5. **Add the IR receiver.** Connect its supply and ground according to the board labels; use GPIO5 as the default OUT signal unless the firmware/Web UI configuration is changed.
 6. **Build one IR LED branch.** Wire the resistor, two series LEDs and MOSFET load path using the polarity in the verified circuit. Add the 100 Ω gate resistor and 10 kΩ gate pulldown as drawn. Check branch current with a suitable meter/test setup.
 7. **Add the remaining five branches** only after current and thermal checks. Make wiring and supply distribution thick enough for the current.
-8. **Add the optional DS18B20.** Connect data to GPIO16 by default and a 4.7 kΩ pull-up from data to 3.3 V. Make sure this wiring matches the actual sensor package and pinout.
-9. **Add status indication** only after deciding whether the design uses the firmware's single status LED or the drawn RGB LED. Do not wire the RGB pins as shown without a matching firmware change.
-10. Inspect solder joints, polarity, insulation, strain relief and clearance in the enclosure. Do not connect the full-power IR array until the low-current logic/flash tests pass.
+8. **Install the DS18B20 probe.** Fit the waterproof probe into its top-plate opening, connect data to GPIO16 by default and add the 4.7 kΩ pull-up from data to 3.3 V. Check the probe cable pinout/colours rather than relying on assumed wire colours.
+9. **Install the single status LED** in its top-plate opening. Firmware defaults to GPIO2 (D1 mini D4), active LOW, through a suitable current-limiting resistor. The built device does not use the RGB LED drawn in the older diagram.
+10. Install the IR receiver in its top-plate opening and orient it so it can receive the original remote. Learning is started from the Web UI; the receiver captures the IR signal. There is no physical learning button. Install the reset button underneath and connect it to the D1 mini RST input. Inspect solder joints, polarity, insulation, strain relief and clearance in the enclosure. Do not connect the full-power IR array until the low-current logic/flash tests pass.
 
 ## Print and fit the enclosure
 
