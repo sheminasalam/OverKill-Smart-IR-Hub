@@ -1,28 +1,41 @@
 # OverKill Smart IR Hub
 
-> **A LOW-COST, LOCAL ALTERNATIVE TO EXPENSIVE BRANDED IR HUBS**
->
-> Build your own universal infrared hub from inexpensive ESP8266 hardware, commonly available components and a PETG 3D-printed enclosure. OverKill brings IR learning and replay, a local Web UI, MQTT and Home Assistant integration into a DIY device you can assemble, understand and maintain yourself—with an Alexa Smart Home cloud bridge for voice control.
->
-> **The goal: affordable hardware, local control, and no dependence on a proprietary IR-hub ecosystem.**
+OverKill is a DIY universal infrared (IR) hub built around an ESP8266. It is designed to give existing IR-controlled appliances—such as TVs, air conditioners and fans—smart control without requiring you to buy an expensive branded IR hub.
 
-## The cost advantage
+The project combines a compact, PETG-printed enclosure with a browser-based setup interface, external flash storage for learned commands, MQTT, Home Assistant integration, an optional temperature probe, and an Alexa Smart Home cloud bridge.
 
-The six major line items below add up to approximately **₹317** at the supplier prices observed for this estimate on **25 October 2026**:
+## What you can build
 
-| Major component | Listed price |
+- **Learn and replay IR commands:** use the receiver to capture commands from an appliance's original remote, then replay them from the hub.
+- **Manage devices locally:** use the hub's Web UI to organize remotes and commands, configure Wi-Fi and MQTT, and manage supported rules and schedules.
+- **Integrate with Home Assistant:** use MQTT discovery and the companion custom integration to connect the hub with your home-automation setup.
+- **Add temperature-aware behaviour:** the enclosure and firmware support the waterproof DS18B20 temperature probe.
+- **Add voice control:** the companion AWS Lambda and Alexa Smart Home setup can expose selected devices to Alexa.
+- **Build and repair it yourself:** the enclosure model, component links, firmware and setup instructions are provided so you can understand the hardware rather than depend on a closed commercial hub.
+
+## What to expect
+
+This is a DIY build, not a plug-and-play retail product. You should expect to source the components, assemble and test the electronics, print the enclosure in PETG, flash the firmware and configure the local MQTT/Home Assistant path. Alexa voice control adds separate Amazon/AWS account and cloud setup, and requires an internet connection. The hub's local Web UI and local MQTT/Home Assistant path are intended for local control; Alexa's cloud voice path is not fully local.
+
+The author's physical build uses a **D1 mini ESP8266 development board**, which already includes 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. Before constructing a board from the older schematic, read the pin-map warning below: the external flash chip-select assignment still needs to be reconciled between the firmware and the original diagram.
+
+## Indicative component cost
+
+As a rough reference, six major component line items total about **US$3.68**, converted from the supplier's Indian retail prices using **US$1 = ₹94.76** (reference rate dated 25 October 2026). This is a partial materials subtotal—not the cost of a complete working hub.
+
+| Major component | Approx. price in USD |
 |---|---:|
-| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | ₹144 |
-| [W25Q32 4 MiB flash module](https://quartzcomponents.com/collections/all/products/w25q32-32mbit-capacity-flash-storage-module) | ₹57 |
-| [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/collections/all/products/ds18b20-water-proof-temperature-sensor) | ₹34 |
-| [12 × 940 nm IR LEDs](https://quartzcomponents.com/collections/ir-sensor) at ₹4.50 each | ₹54 |
-| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | ₹5 |
-| [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | ₹23 |
-| **Subtotal for these six line items** | **₹317** |
+| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | $1.85 |
+| [W25Q32 4 MiB flash module](https://quartzcomponents.com/collections/all/products/w25q32-32mbit-capacity-flash-storage-module) | $0.60 |
+| [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/collections/all/products/ds18b20-water-proof-temperature-sensor) | $0.36 |
+| [12 × 940 nm IR LEDs](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led) | $0.57 |
+| [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | $0.06 |
+| [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | $0.24 |
+| **Subtotal for these six line items** | **$3.68** |
 
-*This is a transparent reference subtotal, not the complete build cost or a guaranteed current quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V power supply/cable, PETG filament and print waste, tools, shipping, and any optional regulator. Supplier prices, stock availability and taxes may change; the selected IR LED listing was shown as sold out when checked. The author's D1 mini build already includes 3.3 V regulation; a bare ESP-12F variant needs an additional 5 V-to-3.3 V regulator.
+*The prices are converted from [Quartz Components' Indian listings](https://quartzcomponents.com/) using a [USD/INR reference rate of ₹94.76 per US dollar](https://exchangeratetool.com/historical/usd-inr) for 25 October 2026. This is an illustration for international readers, not a worldwide quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V supply and cable, PETG filament and print waste, tools, shipping, taxes, and any optional regulator. Local prices and import costs will vary; the linked IR LED listing was shown as sold out when checked.
 
-The build and setup instructions below take you from the bill of materials through assembly, firmware, Home Assistant, AWS IoT and Alexa.
+The sections below walk through the hardware, firmware, Home Assistant integration, AWS IoT certificates and Alexa setup in detail.
 
 > [!CAUTION]
 > **Use the corrected connection diagram below.** It shows W25Q32 flash CS on GPIO3 to match the firmware constants; GPIO3 is also UART0 RX, so the diagram notes the serial-console limitation and cautions against remapping the pin. The enclosure image identifies the three top openings, USB-C 5 V input provision, and underside reset pinhole. The hardware has one status LED and no physical learning button; learning is started from the Web UI using the IR receiver. See the [pin-map notes](hardware/PIN-MAP.md).
