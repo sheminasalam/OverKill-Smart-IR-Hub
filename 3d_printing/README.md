@@ -4,7 +4,7 @@
 
 The original [`Overkill.3mf`](Overkill.3mf) is committed in this directory. Open the 3MF directly in your slicer; the preview image is not a printable substitute.
 
-![Labeled enclosure openings and controls](../hardware/OverKill-3MF-Labeled-Product.svg)
+![Labeled enclosure openings and controls](../hardware/Overkill_labeled.png)
 
 ## Print material: PETG
 
