@@ -131,4 +131,16 @@ For cloud Alexa, ensure each intended device is marked for cloud exposure in its
 
 ## Board/core version and flash setting
 
-The committed source enforces IRremoteESP8266 2.9.0. The project hardware used for this build is a D1 mini. The source does **not** identify a tested ESP8266 Arduino core version, the internal flash chip fitted to the specific D1 mini, or the exact Arduino Tools settings used for the author's final build. These cannot be safely inferred from source code alone. Before publishing a compiled binary, record the actual Boards Manager core version, selected board profile, detected internal flash size, flash layout/OTA setting, CPU frequency, upload speed and PubSubClient version used for a successful build. Select flash settings to match the internal flash on the module—not the external W25Q32 database chip.
+The repository does not yet pin a fully reproducible Arduino build profile. These are the settings supported by the current source and documentation, distinguished from those still needing a real build/board check:
+
+| Build item | Current value/status |
+|---|---|
+| Physical board | D1 mini ESP8266 development board |
+| Arduino board profile to select | `LOLIN(WEMOS) D1 R2 & mini` (verify that this is the exact profile used by your installed ESP8266 core) |
+| External persistent storage | W25Q32 32-Mbit SPI flash module, **4 MiB**. This is separate from the ESP8266 module's internal flash. |
+| IRremoteESP8266 library | **2.9.0 exactly**; the source enforces this version |
+| ESP8266 Arduino core | **Not recorded/pinned yet** |
+| ESP8266 internal flash size and flash layout / OTA setting | **Not recorded or verified for the actual D1 mini**; these settings depend on the module fitted and must not be inferred from the external W25Q32 |
+| PubSubClient version, CPU frequency, flash mode and upload speed | **Not recorded/pinned yet** |
+
+Before publishing a firmware binary as reproducible, build against a documented core version and record the actual board profile, module/internal-flash size and Tools settings from a successful compile/flash on the target hardware. The repository currently supplies source rather than a verified precompiled binary. Do not fill the unknown fields with assumed default values.
