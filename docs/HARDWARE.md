@@ -2,7 +2,7 @@
 
 This page documents the actual build: a D1 mini development board, W25Q32 flash, USB-C 4-pin power breakout, IR receiver and transmitter, waterproof DS18B20 probe, one status LED, an underside reset button and a PETG enclosure. The original ESP-12F circuit drawing must be adapted for the D1 mini board labels.
 
-**Circuit reference:** [Updated bare ESP-12F connection diagram](../hardware/OverKill-ESP12F-Connection-Diagram.svg). The diagram follows the firmware's default GPIO constants and shows a standalone ESP-12F plus external 3.3 V regulator. It is not a drop-in D1 mini schematic: on a D1 mini, the onboard USB-UART TX is connected to GPIO3/RX0, which the current firmware also uses as flash CS. Isolate that UART-TX connection or redesign the CS pin and firmware together before using the D1 mini variant.
+**Current connection diagram:** [Open the uploaded circuit diagram (PNG)](../hardware/circuit-diagram.png). It shows flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS = 3` constant in the firmware. There is still a source diagnostic mismatch: the Stage Info printout says `GPIO15 -> W25Qxx CS`. Treat that printed label as stale until corrected. The diagram uses ESP-12F GPIO names, while the author's build uses a D1 mini; on that board GPIO3 is labelled RX and is also connected to the USB-UART interface. Verify serial programming/debug behaviour on the actual board before treating it as a final validated schematic.
 
 ## Bill of materials (BOM)
 
@@ -65,7 +65,7 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 | W25Qxx MISO | GPIO12 | SPI bus |
 | W25Qxx MOSI | GPIO13 | SPI bus |
 | W25Qxx SCLK | GPIO14 | SPI bus |
-| W25Qxx CS | **GPIO3** | Conflicts with the provided diagram, which labels CS as GPIO15. GPIO3 is also UART0 RX. Resolve before final wiring. |
+| W25Qxx CS | **GPIO3** | Matches the current connection image and compile-time constant. The Stage Info diagnostic still prints GPIO15 and needs correction. GPIO3 is also UART0 RX; verify the board's serial/programming behaviour. |
 | IR TX | GPIO4 default | Can be changed in the Web UI's Hub configuration; confirm the resulting pin allocation. |
 | IR RX | GPIO5 default | Can be changed in the Web UI's Hub configuration; confirm the resulting pin allocation. |
 | Status LED | GPIO2 default, active LOW | Firmware uses a single status indicator. |
@@ -78,19 +78,19 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 1. With all power removed, identify the actual W25Qxx module's CS pad.
 2. Use a continuity meter to determine which ESP-12F pad it reaches. Do not infer the connection from wire colour or from a rendered image.
 3. Compare that physical connection against `PIN_FLASH_CS` in the firmware.
-4. Decide the final implementation based on the real board and ESP8266 boot requirements. If a pin change is made, update the source, diagram and self-test documentation together.
+4. Confirm the W25Q32 CS wire on the actual D1 mini goes to GPIO3/RX as the current image and compile-time constant specify. Correct the Stage Info diagnostic so it also reports GPIO3. If the hardware really uses another pin, update the code and diagram together instead.
 5. Test boot, serial programming, flash JEDEC-ID detection, read/write/erase and power-cycle persistence.
-6. Replace the original drawing only after those tests pass. The current review asset is a review aid, not a wiring schematic: [hardware/pin-map-review.svg](hardware/pin-map-review.svg).
+6. Use the uploaded [connection diagram](../hardware/circuit-diagram.png) as the current reference, but do not treat an image alone as proof of the physical wiring.
 
 The actual firmware constant is the code's behaviour; the fact that a drawing labels a different pin does not make the physical board correct.
 
 ## Assemble and inspect the electronics
 
-Do not follow the original diagram blindly while the CS conflict is unresolved. Once the final CS decision is settled, use the following sequence to reduce debugging complexity.
+The current code constant and connection image both use GPIO3 for flash CS, but the firmware's Stage Info diagnostic still reports GPIO15 and GPIO3 is also UART0 RX on the D1 mini. Verify that hardware path and correct the diagnostic output before finalizing the build.
 
 1. **Prepare the 5 V input.** Solder/connect the 4-pin USB-C breakout in its enclosure provision. Wire VBUS to the 5 V input and GND to common ground; leave D+/D− unconnected for power-only operation. The breakout has no CC1/CC2 pins, so use a USB-A source with a USB-A-to-USB-C cable unless you add and validate the proper USB-C CC pull-down arrangement. For the D1 mini build, feed 5 V to its 5V input pin and let its onboard regulator produce 3.3 V. For a bare ESP-12F build, connect 5 V to the AMS1117 module input and use its 3.3 V output for the ESP/peripherals.
 2. **Verify grounds.** Confirm continuity among ESP GND, flash GND, IR receiver GND, MOSFET source/ground and the 5 V LED supply ground.
-3. **Install external flash.** Connect VCC to 3.3 V, GND to GND, MISO to GPIO12, MOSI to GPIO13 and SCLK to GPIO14. Connect CS only after resolving the GPIO conflict above. Do not power a 3.3 V flash module from 5 V.
+3. **Install external flash.** Connect VCC to 3.3 V, GND to GND, MISO to GPIO12, MOSI to GPIO13 and SCLK to GPIO14. Connect CS to GPIO3 as shown in the current diagram and compile-time constant, but verify the actual D1 mini wiring and remember GPIO3 is also UART0 RX. The firmware's Stage Info label saying GPIO15 is stale and should be corrected. Do not power a 3.3 V flash module from 5 V.
 4. **Inspect for shorts.** Measure between 3.3 V and GND and between 5 V and GND before attaching the ESP. Investigate any near-short before power-on.
 5. **Add the IR receiver.** Connect its supply and ground according to the board labels; use GPIO5 as the default OUT signal unless the firmware/Web UI configuration is changed.
 6. **Build one IR LED branch.** Wire the resistor, two series LEDs and MOSFET load path using the polarity in the verified circuit. Add the 100 Ω gate resistor and 10 kΩ gate pulldown as drawn. Check branch current with a suitable meter/test setup.
@@ -101,9 +101,9 @@ Do not follow the original diagram blindly while the CS conflict is unresolved. 
 
 ## Print and fit the enclosure
 
-![Labeled enclosure render from the 3MF](../hardware/OverKill-3MF-Labeled-Product.svg)
+![Enclosure views with labeled openings and controls](../hardware/Overkill_labeled.png)
 
-The image labels the outer parts/features present in the model. It does not show the electronics.
+The image labels the enclosure openings, USB-C power provision and underside reset pinhole.
 
 The project uses the committed multi-object [`Overkill.3mf`](../3d_printing/Overkill.3mf). **Print the enclosure in PETG.** The model includes provisions for the USB-C breakout board and the top-plate openings for the DS18B20 probe, IR receiver and status LED. The reset button is accessed underneath the device. Use the filament manufacturer's recommended PETG profile as the starting point; exact temperatures, fan settings, speed, infill and orientation have not been validated for this model.
 
