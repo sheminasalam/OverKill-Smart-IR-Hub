@@ -19,6 +19,25 @@ This is a DIY build, not a plug-and-play retail product. You should expect to so
 
 The author's physical build uses a **D1 mini ESP8266 development board**, which already includes 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. Before assembly, read the pin-map warning below: the compile-time flash-CS setting and current connection image both use GPIO3, but the firmware's Stage Info diagnostic still prints GPIO15 for flash CS. GPIO3 is also UART0 RX, so serial input/programming needs to be tested on the actual D1 mini.
 
+## Product and hardware preview
+
+### Enclosure and physical layout
+
+![OverKill Smart IR Hub enclosure with the sensor openings, USB-C power provision and underside reset access labeled](hardware/Overkill_labeled.png)
+
+The enclosure image shows the three top-plate openings for the **DS18B20 temperature probe**, **IR receiver used for learning**, and **status LED**. It also identifies the side provision for the USB-C 5 V power input and the reset access underneath the device.
+
+[Open the printable `Overkill.3mf` model](3d_printing/Overkill.3mf). Print the enclosure in **PETG**; the image is a visual reference, not a substitute for the 3MF.
+
+### Connection diagram
+
+![OverKill Smart IR Hub connection diagram](hardware/circuit-diagram.png)
+
+The diagram is the wiring reference for the electronics. It uses ESP-12F GPIO names, while the author's physical build uses a D1 mini, so follow the [D1 mini pin-map notes](hardware/PIN-MAP.md) when wiring that board.
+
+> [!CAUTION]
+> The compile-time firmware constant and the uploaded connection diagram assign W25Q32 flash CS to **GPIO3**, but the firmware's Stage Info diagnostic still prints **GPIO15**. GPIO3 is also UART0 RX on the D1 mini. Verify the actual wiring and serial-programming behaviour before treating the circuit as fully validated; see the [release checklist](docs/RELEASE_CHECKLIST.md).
+
 ## Indicative component cost
 
 As a rough reference, six major component line items total about **US$3.34**, converted from the supplier's Indian retail prices using **US$1 = ₹94.76** (reference rate dated 25 October 2026). This is a partial materials subtotal—not the cost of a complete working hub.
@@ -37,14 +56,12 @@ As a rough reference, six major component line items total about **US$3.34**, co
 
 The sections below walk through the hardware, firmware, Home Assistant integration, AWS IoT certificates and Alexa setup in detail.
 
-> [!CAUTION]
-> **Use the current connection diagram below.** It shows W25Q32 flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS` constant. However, the firmware's Stage Info output still says GPIO15 for flash CS; that diagnostic string is stale. GPIO3 is also UART0 RX, so serial input/programming needs physical verification before release. The enclosure image identifies the three top openings, USB-C 5 V input provision, and underside reset pinhole. The hardware has one status LED and no physical learning button; learning is started from the Web UI using the IR receiver. See the [pin-map notes](hardware/PIN-MAP.md).
+## Build journey
 
-**Connection diagram:** [Open the connection diagram (PNG)](hardware/circuit-diagram.png). It shows the ESP-12F pin names used by the firmware. A bare ESP-12F needs a suitable 5 V-to-3.3 V regulator; the author's D1 mini build already has onboard regulation. GPIO3 is also UART0 RX, so read the serial/flash-CS note in the diagram and [pin-map notes](hardware/PIN-MAP.md).
-
-![OverKill enclosure with labeled openings and controls](hardware/Overkill_labeled.png)
-
-**Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The labeled PNG above is a visual reference, **not** the printable 3MF file.
+1. **Source parts and print the enclosure** — use the linked BOM, the original 3MF and PETG printing guide.
+2. **Assemble and flash the hub** — wire the components, install the firmware, then configure Wi-Fi and the local Web UI.
+3. **Connect Home Assistant** — configure MQTT and install the companion custom integration.
+4. **Add Alexa voice control (optional)** — configure the AWS IoT bridge, deploy the Lambda, create the Smart Home skill, and complete account linking.
 
 ## Build and setup guides
 
