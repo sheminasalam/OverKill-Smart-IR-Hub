@@ -1,5 +1,7 @@
 # Pin-map review — actual build notes plus unresolved flash-CS issue
 
+Updated vector diagram: [OverKill ESP-12F Connection Diagram](OverKill-ESP12F-Connection-Diagram.svg). It is the bare ESP-12F version, not a drop-in wiring diagram for the author's D1 mini board.
+
 The project author's assembled version uses a **D1 mini ESP8266 development board**, not a bare ESP-12F module. The original connection diagram was drawn with ESP-12F GPIO numbers. The D1 mini silkscreen uses Dx aliases, so use the mapping below when wiring the actual board.
 
 | ESP8266 GPIO used by firmware | Typical D1 mini silkscreen | Function / note |
