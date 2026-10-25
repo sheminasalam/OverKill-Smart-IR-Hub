@@ -24,7 +24,7 @@ The other includes in the sketch are provided by the Arduino ESP8266 core. Insta
    - `webui_backend.h`
    - `captive_dns.h`
 4. Open `OverKill-v1.ino` in Arduino IDE.
-5. Select the ESP8266 board profile that matches your actual ESP-12F carrier. If using a bare ESP-12F module/adapter, a Generic ESP8266 Module profile may be appropriate, but its flash size and other board settings must match the module/carrier you actually have. Do not assume settings from another ESP board.
+5. For the author's actual D1 mini board, select the matching D1 mini profile in Arduino IDE (commonly **LOLIN(WEMOS) D1 R2 & mini**) and make sure flash size/flash layout settings match the specific board. If building with a bare ESP-12F instead, select a compatible Generic ESP8266 Module profile and match its internal flash settings. Do not choose a generic ESP-12F profile for the author's D1 mini build.
 6. Select the correct serial port and compile.
 7. If compilation says the IRremoteESP8266 version macro is missing or wrong, re-check the installed library and ensure Arduino is not picking up a duplicate library copy.
 8. Record the ESP8266 core version, board selection, flash setting and PubSubClient version used for the release.
@@ -33,16 +33,16 @@ No release binary is supplied in this repository at present because a reproducib
 
 ## First flash and first boot
 
-1. Connect the ESP-12F programming adapter. Check the adapter's voltage levels; use 3.3 V UART logic.
+1. For the author's D1 mini, program through the board's USB programming port; the enclosure's 4-pin USB-C breakout is the separate 5 V product power input, not the programming interface. If programming a bare ESP-12F, use a suitable 3.3 V UART adapter and the module's documented boot/reset sequence.
 2. Put the ESP8266 into its serial programming mode using the carrier's documented boot/reset procedure.
 3. Upload the compiled sketch.
 4. Open Serial Monitor at the baud rate defined by the sketch and reset the hub.
 5. Review the startup and **HARDWARE FOUNDATION SELF-TEST** output. The source reports the IR TX idle state, W25Qxx CS idle state and configured GPIOs.
 6. Confirm the W25Qxx is detected, its JEDEC ID/capacity are plausible, and storage initializes. If storage detection fails, stop and inspect CS, SPI wiring, voltage and the chip/module part number.
-7. Before learning anything, test a minimal IR transmission and receiver capture. The physical GPIO0 learn button is disabled in the current source; learning is initiated through the Web UI.
+7. Before learning anything, test a minimal IR transmission and receiver capture. The built hardware has **no physical learning button**: start learning from the Web UI and use the top-plate IR receiver to capture the original remote's signal.
 8. If serial output says storage is in RAM-only mode, do not expect learned devices to survive reset. Fix flash detection first.
 
-The source code currently uses GPIO3 as flash CS while the drawing says GPIO15. Serial upload/debugging also uses GPIO3 as UART RX, which can complicate diagnosis if that pin is tied to the flash. Resolve this before interpreting failures as a bad flash chip.
+The source code currently uses GPIO3 as flash CS while the supplied diagram says GPIO15 (D8 on a typical D1 mini). GPIO3 is also D1 mini RX, which can complicate serial programming/debugging if it is tied to the flash. Resolve the physical CS wiring and align code plus schematic before interpreting failures as a bad flash chip.
 
 ## Configure Wi-Fi and open the Web UI
 
@@ -129,4 +129,4 @@ For cloud Alexa, ensure each intended device is marked for cloud exposure in its
 
 ## Board/core version and flash setting
 
-The committed source enforces IRremoteESP8266 2.9.0. It does **not** identify a tested ESP8266 Arduino core version, the internal flash chip fitted to the specific ESP-12F module, or the exact Arduino Tools settings used for the author's final build. These cannot be safely inferred from source code alone. Before publishing a compiled binary, record the actual Boards Manager core version, selected board profile, detected internal flash size, flash layout/OTA setting, CPU frequency, upload speed and PubSubClient version used for a successful build. Select flash settings to match the internal flash on the module—not the external W25Q32 database chip.
+The committed source enforces IRremoteESP8266 2.9.0. The project hardware used for this build is a D1 mini. The source does **not** identify a tested ESP8266 Arduino core version, the internal flash chip fitted to the specific D1 mini, or the exact Arduino Tools settings used for the author's final build. These cannot be safely inferred from source code alone. Before publishing a compiled binary, record the actual Boards Manager core version, selected board profile, detected internal flash size, flash layout/OTA setting, CPU frequency, upload speed and PubSubClient version used for a successful build. Select flash settings to match the internal flash on the module—not the external W25Q32 database chip.
