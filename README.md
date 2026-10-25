@@ -36,7 +36,7 @@ The enclosure image shows the three top-plate openings for the **DS18B20 tempera
 The diagram is the wiring reference for the electronics. It uses ESP-12F GPIO names, while the author's physical build uses a D1 mini, so follow the [D1 mini pin-map notes](hardware/PIN-MAP.md) when wiring that board.
 
 > [!CAUTION]
-> The intended wiring in the compile-time firmware setting and committed circuit diagram is **W25Q32 CS → GPIO3/RX** and **single status LED → GPIO2/D4 (active LOW)**. The Stage Info diagnostic is stale and reports GPIO15 for flash CS; the code's pin constant and diagram specify GPIO3. GPIO3 is also UART0 RX on the D1 mini, so test the actual board's flash operations, boot and serial-programming/debug workflow before treating the physical build as validated. There is no physical learn button (use the Web UI and IR receiver), and the underside reset button uses the dedicated RST pad.
+> The intended wiring in the compile-time firmware setting and committed circuit diagram is **W25Q32 CS → GPIO3/RX** and **single status LED → GPIO2/D4 (active LOW)**. The Stage Info diagnostic has been corrected to report GPIO3 for flash CS. GPIO3 is also UART0 RX on the D1 mini, so test the actual board's flash operations, boot and serial-programming/debug workflow before treating the physical build as validated. There is no physical learn button (learning starts in the Web UI and uses the IR receiver), and the underside reset button uses the dedicated RST pad, not a general GPIO.
 
 ## Indicative component cost
 
@@ -75,6 +75,20 @@ The sections below walk through the hardware, firmware, the Home Assistant disco
 6. [**3D printing / PETG guide**](3d_printing/README.md) — enclosure model status, PETG material and test-fit steps.
 7. [**Release checklist**](docs/RELEASE_CHECKLIST.md) — hardware, firmware, cloud and packaging gates.
 
+### Firmware build settings
+
+| Item | Current recorded value |
+|---|---|
+| Board used by this project | D1 mini ESP8266 development board |
+| Arduino board profile | `LOLIN(WEMOS) D1 R2 & mini` is the documented selection; the exact profile used for a successful release build is not recorded yet. |
+| External W25Q32 storage | 32 Mbit / **4 MiB**; separate from the ESP8266 module's internal flash. |
+| IRremoteESP8266 | **2.9.0 exactly**, enforced by source |
+| ESP8266 Arduino core version | **Not recorded/pinned yet** |
+| ESP8266 internal flash size/layout | **Not measured/recorded for the physical D1 mini**; do not infer it from the external W25Q32 chip. |
+| PubSubClient version and Arduino Tools settings | **Not recorded/pinned yet**; verify CPU frequency, flash size/layout, flash mode and upload speed on the tested build. |
+
+The repository supplies firmware source, not a verified precompiled binary. Record the values from a successful compile and flash on the actual board before claiming a reproducible release.
+
 ## Architecture
 
 ```text
@@ -91,13 +105,26 @@ The cloud Alexa architecture above is optional as a feature, but **account linki
 
 ## Repository status
 
-The firmware sources, updated Lambda, circuit diagram, labeled enclosure image and original 3MF model are committed. The diagram is [`hardware/circuit-diagram.png`](hardware/circuit-diagram.png), the labeled enclosure image is [`hardware/Overkill_labeled.png`](hardware/Overkill_labeled.png), and the printable model is [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The source constant and diagram agree on flash CS = GPIO3; the remaining hardware validation is to test flash persistence, boot and serial programming on the actual D1 mini. The companion Home Assistant integration is maintained separately at [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration). The repository still has no `LICENSE` file; `LICENSE_PENDING.md` is only a reminder, not a license.
+The firmware sources, updated Lambda, circuit diagram, labeled enclosure image and original 3MF model are committed. The diagram is [`hardware/circuit-diagram.png`](hardware/circuit-diagram.png), the labeled enclosure image is [`hardware/Overkill_labeled.png`](hardware/Overkill_labeled.png), and the printable model is [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The source constant, corrected Stage Info diagnostic and diagram agree on flash CS = GPIO3; the remaining hardware validation is to test flash persistence, boot and serial programming on the actual D1 mini. The companion Home Assistant integration is maintained separately at [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration). This repository is licensed under the MIT License; see [`LICENSE`](LICENSE).
 
 The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The intended flash-CS pin is GPIO3 in both the source constant and diagram; the remaining hardware validation is to test W25Q32 read/write/erase and persistence, boot stability and serial programming on the actual D1 mini. The build is not yet reproducible because the ESP8266 core version and the board's internal-flash size/layout have not been recorded.
 
 ## Current Lambda source
 
-[Open `alexa_lambda/index.mjs`](alexa_lambda/index.mjs). The committed repository version does not read `ALEXA_EVENT_CLIENT_ID`, `ALEXA_EVENT_CLIENT_SECRET` or `DELETE_LEGACY_TV_SCENES_ON_ACCEPT_GRANT`. It does not implement Alexa Event Gateway token exchange/refresh or legacy TV-scene deletion on `AcceptGrant`, so these variables have no effect on this source. Keep **Send Alexa Events** disabled unless the deployed Lambda is verified to implement and test that support. If the deployed Lambda differs, export its current source and synchronize it with this repository before describing its environment variables as supported.
+[Open `alexa_lambda/index.mjs`](alexa_lambda/index.mjs). The table below documents the committed Lambda source, not an independently deployed function in your AWS account. This source does not read `ALEXA_EVENT_CLIENT_ID`, `ALEXA_EVENT_CLIENT_SECRET` or `DELETE_LEGACY_TV_SCENES_ON_ACCEPT_GRANT` and does not implement Event Gateway token exchange/refresh or legacy TV-scene deletion on `AcceptGrant`. The three variables therefore have no effect on this version. Keep **Send Alexa Events** disabled unless the deployed Lambda is verified to implement and test that support.
+
+| Lambda environment variable | Required? | Behavior in the committed source |
+|---|---|---|
+| `IOT_ENDPOINT` | **Required** | AWS IoT data endpoint hostname; the Lambda throws an error if it is missing. |
+| `IOT_REGION` | Optional | AWS region; defaults to `eu-west-1`. Match it to the endpoint. |
+| `CONFIG_TOPIC` | Optional | Retained device catalogue; defaults to `alexa/config/devices`. |
+| `STATE_TOPIC` | Optional | State topic template; defaults to `alexa/state/{id}`. Keep `{id}` literal. |
+| `CMD_TOPIC` | Optional | Hub directive topic template; defaults to `alexa/{hub}/directive`. Keep `{hub}` literal. |
+| `STATUS_TOPIC` | Optional | Hub status topic template; defaults to `alexa/status/{hub}`. Keep `{hub}` literal. |
+| `WRITE_STATE` | Optional | Enabled by default. Set exactly to `false` to prevent Lambda state writes. |
+| `ALEXA_EVENT_CLIENT_ID` | Not used by this source | Event Gateway client credentials are not implemented in this committed code. Setting the variable does not enable proactive events. |
+| `ALEXA_EVENT_CLIENT_SECRET` | Not used by this source | Event Gateway token exchange/refresh is not implemented in this committed code. Do not set this expecting proactive event support. |
+| `DELETE_LEGACY_TV_SCENES_ON_ACCEPT_GRANT` | Not used by this source | Legacy TV-scene deletion on `AcceptGrant` is not implemented; the variable has no effect. |
 
 ## References
 
