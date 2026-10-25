@@ -356,7 +356,7 @@ Replace `REGION`, `ACCOUNT_ID` and `BRIDGE_CLIENT_ID`. Set the bridge client ID 
     {
       "Effect": "Allow",
       "Action": "iot:Subscribe",
-      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:topicfilter/alexa/????/directive"
+      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:topicfilter/alexa/+/directive"
     },
     {
       "Effect": "Allow",
@@ -372,7 +372,7 @@ Replace `REGION`, `ACCOUNT_ID` and `BRIDGE_CLIENT_ID`. Set the bridge client ID 
 }
 ```
 
-The `????` wildcard pattern targets the four-character hub tag used in the directive topic. If the deployment uses custom topics or client IDs, change the ARNs to match.
+For SUBSCRIBE, the policy ARN must match the exact MQTT filter, including the literal single-level wildcard token. For RECEIVE, `????` matches the four-character hub tag in an actual topic. If the deployment uses custom topics or client IDs, change the ARNs to match.
 
 ## 14. Configure the AWS bridge in Home Assistant
 
