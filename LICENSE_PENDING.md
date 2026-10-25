@@ -1,3 +1,0 @@
-# License decision required
-
-No explicit project license was included with the submitted files. This notice is not a license. Before publishing a public release, choose and add a license that covers the firmware, Home Assistant integration, Alexa Lambda source, hardware documentation and 3D model, and verify the licensing of dependencies and third-party assets. Until an actual LICENSE file is added, do not assume this repository grants permission to redistribute, modify or manufacture the design.
