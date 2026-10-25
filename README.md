@@ -8,9 +8,9 @@ The project combines a compact, PETG-printed enclosure with a browser-based setu
 
 - **Learn and replay IR commands:** use the receiver to capture commands from an appliance's original remote, then replay them from the hub.
 - **Manage devices locally:** use the hub's Web UI to organize remotes and commands, configure Wi-Fi and MQTT, and manage supported rules and schedules.
-- **Integrate with Home Assistant:** use MQTT discovery and the companion custom integration to connect the hub with your home-automation setup.
+- **Choose a Home Assistant path:** use the firmware's native MQTT discovery for Home Assistant entities, or select the OverKill Smart Hub custom integration for its richer hub integration and Alexa cloud bridge. These discovery modes are separate choices.
+- **Choose an Alexa path:** local Emulated Hue can expose individual learned commands as on/off light switches; the Alexa Smart Home cloud path exposes whole device types and supports richer remote commands.
 - **Add temperature-aware behaviour:** the enclosure and firmware support the waterproof DS18B20 temperature probe.
-- **Add voice control:** the companion AWS Lambda and Alexa Smart Home setup can expose selected devices to Alexa.
 - **Build and repair it yourself:** the enclosure model, component links, firmware and setup instructions are provided so you can understand the hardware rather than depend on a closed commercial hub.
 
 ## What to expect
@@ -54,23 +54,24 @@ As a rough reference, six major component line items total about **US$3.34**, co
 
 *The prices are converted from [Quartz Components' Indian listings](https://quartzcomponents.com/) using a [USD/INR reference rate of ₹94.76 per US dollar](https://exchangeratetool.com/historical/usd-inr) for 25 October 2026. This is an illustration for international readers, not a worldwide quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V supply and cable, PETG filament and print waste, tools, shipping, taxes, and any optional regulator. Local prices and import costs will vary; the linked IR LED listing was shown as sold out when checked.
 
-The sections below walk through the hardware, firmware, Home Assistant integration, AWS IoT certificates and Alexa setup in detail.
+The sections below walk through the hardware, firmware, the Home Assistant discovery choices, the Alexa connection options, AWS IoT certificates and cloud Alexa setup in detail.
 
 ## Build journey
 
 1. **Source parts and print the enclosure** — use the linked BOM, the original 3MF and PETG printing guide.
 2. **Assemble and flash the hub** — wire the components, install the firmware, then configure Wi-Fi and the local Web UI.
-3. **Connect Home Assistant** — configure MQTT and install the companion custom integration.
-4. **Add Alexa voice control (optional)** — configure the AWS IoT bridge, deploy the Lambda, create the Smart Home skill, and complete account linking.
+3. **Choose Home Assistant discovery** — use native Home Assistant MQTT discovery for entities only, or select Custom Integration and install the companion integration for its added features and Alexa cloud path.
+4. **Choose Alexa control (optional)** — expose individual commands through local Emulated Hue, or set up the cloud Smart Home skill, AWS IoT bridge and Lambda for device-aware remote commands. The cloud path requires the custom integration.
 
 ## Build and setup guides
 
 1. [**Hardware, BOM, assembly and 3D printing**](docs/HARDWARE.md) — parts with exact supplier links, power/driver safety, pin conflict and enclosure fit.
 2. [**Firmware and first boot**](docs/FIRMWARE.md) — Arduino environment, flashing, recovery AP, Web UI, MQTT and remote learning.
-3. [**Home Assistant integration and HACS plan**](docs/CUSTOM_INTEGRATION.md) — installation, transports, hub discovery and planned dedicated HACS repository.
-4. [**AWS IoT, Lambda, account linking and Alexa**](docs/ALEXA_AWS.md) — includes a three-step copy/paste guide for the Alexa Smart Home skill, Lambda trigger/endpoint and Login with Amazon account linking, plus certificates and troubleshooting.
-5. [**3D printing / PETG guide**](3d_printing/README.md) — enclosure model status, PETG material and test-fit steps.
-6. [**Release checklist**](docs/RELEASE_CHECKLIST.md) — hardware, firmware, cloud and packaging gates.
+3. [**Home Assistant: native MQTT vs custom integration**](docs/CUSTOM_INTEGRATION.md) — discovery-mode differences, installation, MQTT transports and when the custom integration is needed.
+4. [**Alexa and Home Assistant connection options**](docs/ALEXA_OPTIONS.md) — side-by-side comparison of native MQTT, the custom integration, local Emulated Hue and cloud Alexa; includes a device-type/command matrix.
+5. [**AWS IoT, Lambda, account linking and Alexa**](docs/ALEXA_AWS.md) — includes a three-step copy/paste guide for the Alexa Smart Home skill, Lambda trigger/endpoint and Login with Amazon account linking, plus certificates and troubleshooting.
+6. [**3D printing / PETG guide**](3d_printing/README.md) — enclosure model status, PETG material and test-fit steps.
+7. [**Release checklist**](docs/RELEASE_CHECKLIST.md) — hardware, firmware, cloud and packaging gates.
 
 ## Architecture
 
@@ -84,11 +85,11 @@ Alexa Smart Home skill
   -> ESP8266 hub -> IR LED driver -> appliance
 ```
 
-The supplied Lambda uses the retained device catalogue at `alexa/config/devices` by default and publishes commands to `alexa/{hub}/directive`. It requires the `IOT_ENDPOINT` environment variable. The Home Assistant integration's AWS bridge uses a separate X.509 certificate/key pair and connects over MQTT/TLS.
+The cloud Alexa architecture above is optional. For local command switches, the firmware's Emulated Hue server is discovered on the LAN through SSDP and uses the learned commands enabled per command in the Web UI; it does not need this AWS/Lambda path. For cloud Alexa, the supplied Lambda uses the retained device catalogue at `alexa/config/devices` by default and publishes commands to `alexa/{hub}/directive`. It requires the `IOT_ENDPOINT` environment variable. The Home Assistant integration's AWS bridge uses a separate X.509 certificate/key pair and connects over MQTT/TLS.
 
 ## Repository status
 
-The firmware sources, updated Lambda, documentation, corrected connection diagram and enclosure feature views are committed. The original 3MF is at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The connection diagram and labeled enclosure image are visual references; they do not replace the 3MF printable model. GPIO3 is shared by flash CS and UART0 RX in the current firmware, as documented in the diagram. The companion Home Assistant integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
+The firmware sources, Lambda, hardware assets and documentation are in this repository. The original 3MF is at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The connection diagram and labeled enclosure image are visual references; they do not replace the 3MF printable model. GPIO3 is shared by flash CS and UART0 RX in the current firmware, as documented in the diagram. The companion Home Assistant integration is now maintained separately at [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration); consult [Home Assistant: native MQTT vs custom integration](docs/CUSTOM_INTEGRATION.md) before choosing a setup. The main project repository's license status is described by its root license files.
 
 The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on confirming flash-CS wiring and serial behaviour on the actual D1 mini, correcting the stale Stage Info GPIO15 diagnostic, and completing hardware tests.
 
