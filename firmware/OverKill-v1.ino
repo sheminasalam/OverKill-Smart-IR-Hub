@@ -10550,7 +10550,7 @@ void printStageInfo() {
   Serial.println(F("GPIO12 -> W25Qxx MISO"));
   Serial.println(F("GPIO13 -> W25Qxx MOSI"));
   Serial.println(F("GPIO14 -> W25Qxx SCLK"));
-  Serial.println(F("GPIO15 -> W25Qxx CS"));
+  Serial.println(F("GPIO3  -> W25Qxx CS"));
   Serial.print(F("GPIO")); Serial.print(pinDs18b20); Serial.println(F(" -> DS18B20"));
   Serial.println();
   Serial.print(F("Free heap       : ")); Serial.println(ESP.getFreeHeap());
