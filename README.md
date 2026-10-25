@@ -20,7 +20,7 @@ The six major line items below add up to approximately **₹317** at the supplie
 | [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | ₹23 |
 | **Subtotal for these six line items** | **₹317** |
 
-*This is a transparent reference subtotal, not the complete build cost or a guaranteed current quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V power supply/cable, PETG filament and print waste, tools, shipping, and any optional regulator. Supplier prices, availability and taxes may change. The author's D1 mini build already includes 3.3 V regulation; a bare ESP-12F variant needs an additional 5 V-to-3.3 V regulator.
+*This is a transparent reference subtotal, not the complete build cost or a guaranteed current quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V power supply/cable, PETG filament and print waste, tools, shipping, and any optional regulator. Supplier prices, stock availability and taxes may change; the selected IR LED listing was shown as sold out when checked. The author's D1 mini build already includes 3.3 V regulation; a bare ESP-12F variant needs an additional 5 V-to-3.3 V regulator.
 
 The build and setup instructions below take you from the bill of materials through assembly, firmware, Home Assistant, AWS IoT and Alexa.
 
@@ -31,7 +31,7 @@ The build and setup instructions below take you from the bill of materials throu
 
 ![OverKill enclosure with labeled openings and controls](hardware/Overkill_labeled.png)
 
-**Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The SVG above is a visual reference, **not** the printable 3MF file.
+**Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The labeled PNG above is a visual reference, **not** the printable 3MF file.
 
 ## Build and setup guides
 
