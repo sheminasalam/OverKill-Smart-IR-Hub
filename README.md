@@ -21,17 +21,17 @@ The author's physical build uses a **D1 mini ESP8266 development board**, which 
 
 ## Indicative component cost
 
-As a rough reference, six major component line items total about **US$3.68**, converted from the supplier's Indian retail prices using **US$1 = ₹94.76** (reference rate dated 25 October 2026). This is a partial materials subtotal—not the cost of a complete working hub.
+As a rough reference, six major component line items total about **US$3.34**, converted from the supplier's Indian retail prices using **US$1 = ₹94.76** (reference rate dated 25 October 2026). This is a partial materials subtotal—not the cost of a complete working hub.
 
 | Major component | Approx. price in USD |
 |---|---:|
-| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | $1.85 |
+| [D1 mini ESP8266 board](https://quartzcomponents.com/products/wemos-d1-mini-esp8266-nodemcu-mini-d1-module) | $1.52 |
 | [W25Q32 4 MiB flash module](https://quartzcomponents.com/collections/all/products/w25q32-32mbit-capacity-flash-storage-module) | $0.60 |
 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/collections/all/products/ds18b20-water-proof-temperature-sensor) | $0.36 |
 | [12 × 940 nm IR LEDs](https://quartzcomponents.com/products/l518eir1bc1-s61-940nm-5mm-infrared-ir-transmitter-led) | $0.57 |
 | [AO3400 MOSFET](https://quartzcomponents.com/products/ao3400-mosfet-30v-5-8a-a09t-sot-23-c-n-channel-smd-package) | $0.06 |
 | [USB-C 4-pin power breakout](https://quartzcomponents.com/collections/all/products/usb-3-1-female-socket-type-c-connector-4-pin-breakout-pcb-board) | $0.24 |
-| **Subtotal for these six line items** | **$3.68** |
+| **Subtotal for these six line items** | **$3.34** |
 
 *The prices are converted from [Quartz Components' Indian listings](https://quartzcomponents.com/) using a [USD/INR reference rate of ₹94.76 per US dollar](https://exchangeratetool.com/historical/usd-inr) for 25 October 2026. This is an illustration for international readers, not a worldwide quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V supply and cable, PETG filament and print waste, tools, shipping, taxes, and any optional regulator. Local prices and import costs will vary; the linked IR LED listing was shown as sold out when checked.
 
@@ -51,7 +51,7 @@ The sections below walk through the hardware, firmware, Home Assistant integrati
 1. [**Hardware, BOM, assembly and 3D printing**](docs/HARDWARE.md) — parts with exact supplier links, power/driver safety, pin conflict and enclosure fit.
 2. [**Firmware and first boot**](docs/FIRMWARE.md) — Arduino environment, flashing, recovery AP, Web UI, MQTT and remote learning.
 3. [**Home Assistant integration and HACS plan**](docs/CUSTOM_INTEGRATION.md) — installation, transports, hub discovery and planned dedicated HACS repository.
-4. [**AWS IoT, Lambda, account linking and Alexa**](docs/ALEXA_AWS.md) — Root CA/client certificates, bridge policy, Lambda deployment, Login with Amazon account linking, skill setup and troubleshooting.
+4. [**AWS IoT, Lambda, account linking and Alexa**](docs/ALEXA_AWS.md) — includes a three-step copy/paste guide for the Alexa Smart Home skill, Lambda trigger/endpoint and Login with Amazon account linking, plus certificates and troubleshooting.
 5. [**3D printing / PETG guide**](3d_printing/README.md) — enclosure model status, PETG material and test-fit steps.
 6. [**Release checklist**](docs/RELEASE_CHECKLIST.md) — hardware, firmware, cloud and packaging gates.
 
