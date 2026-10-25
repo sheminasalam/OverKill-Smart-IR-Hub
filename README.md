@@ -2,7 +2,7 @@
 
 An ESP8266 ESP-12F-based universal infrared hub with IR learning/replay, external SPI flash storage, a local web UI, MQTT integration, Home Assistant support, an Alexa Smart Home Lambda path, and a 3D-printable enclosure.
 
-> **Draft release warning:** source and diagram review found a critical flash chip-select conflict. The supplied firmware sets `PIN_FLASH_CS = GPIO3` (UART0 RX), while its own Stage Info output and supplied diagram say GPIO15. The diagram's RGB LED and reset button also do not match the firmware's current pin constants. See [`hardware/PIN-MAP.md`](hardware/PIN-MAP.md). Do not wire a build from the original diagram until the mismatch is resolved and verified on the physical hardware.
+> **Draft release warning:** source and diagram review found a critical flash chip-select conflict. The supplied firmware sets `PIN_FLASH_CS = GPIO3` (UART0 RX), while its own Stage Info output and supplied diagram say GPIO15. The diagram's RGB LED and reset button also do not match the firmware's current pin constants. See [`hardware/PIN-MAP.md`](hardware/PIN-MAP.md) and the [visual pin-map review](hardware/pin-map-review.svg). Do not wire a build from the original diagram until the mismatch is resolved and verified on the physical hardware.
 
 ## Current repository contents
 
@@ -21,7 +21,7 @@ Features visible in the supplied source include IR learning/replay, W25Qxx exter
 
 ## Hardware and enclosure
 
-See [`docs/HARDWARE.md`](docs/HARDWARE.md) and [`hardware/PIN-MAP.md`](hardware/PIN-MAP.md). The diagram supplied by the author is not yet a verified final schematic. The external flash CS assignment, status LED and reset/learn buttons need to be reconciled with the actual board and firmware before presenting the circuit as final. The LED array's current and thermal limits must also be calculated from the exact component datasheets.
+See [`docs/HARDWARE.md`](docs/HARDWARE.md), [`hardware/PIN-MAP.md`](hardware/PIN-MAP.md) and the [visual pin-map review](hardware/pin-map-review.svg). The diagram supplied by the author is not yet a verified final schematic. The external flash CS assignment, status LED and reset/learn buttons need to be reconciled with the actual board and firmware before presenting the circuit as final. The LED array's current and thermal limits must also be calculated from the exact component datasheets.
 
 ## Home Assistant
 
