@@ -28,7 +28,7 @@ This document separates items visible in the supplied connection diagram from it
 | W25Qxx MISO | 12 | Source constant |
 | W25Qxx MOSI | 13 | Source constant |
 | W25Qxx SCLK | 14 | Source constant |
-| W25Qxx CS | **3** | Critical conflict with UART0 RX; firmware stage info and supplied drawing say GPIO15 instead. Resolve before wiring/release. |
+| W25Qxx CS | **3** | Critical conflict with UART0 RX; the supplied drawing labels GPIO15 instead. Resolve before wiring/release. |
 | IR TX | 4 | Default; persistent configuration can change it |
 | IR RX | 5 | Default; persistent configuration can change it |
 | Status LED | 2 | Default; active LOW |
@@ -36,7 +36,7 @@ This document separates items visible in the supplied connection diagram from it
 | Physical learn button | 0 | Declared, but firmware says the physical button was removed/disabled due to boot-strap behavior |
 | UART0 TX/RX | 1 / 3 | Serial debugging/input; GPIO3 conflicts with current flash-CS constant |
 
-The PIN_FLASH_CS = 3 constant controls actual chip select via storageCS(). A stage-information print statement says GPIO15, and the original diagram also assigns GPIO15. Correct and physically verify the code and wiring together. Do not guess which reference is intended.
+The PIN_FLASH_CS = 3 constant controls actual chip select via storageCS(). The original diagram assigns GPIO15, but the firmware constant is GPIO3. Correct and physically verify the code and wiring together. Do not guess which reference is intended.
 
 ## IR array safety
 
@@ -62,3 +62,8 @@ Use the provided Overkill.3mf from the release bundle. It contains multiple mesh
 ## Supplied connection diagram
 
 The original drawing is retained as reference only. It is not a verified final schematic because flash CS, RGB status LED and reset-button details conflict with the firmware source.
+
+
+## Firmware and Lambda update note
+
+The current `alexa_lambda/index.mjs` now requires `IOT_ENDPOINT` as an environment variable. Set it to your own AWS IoT data endpoint when deploying the Lambda; do not rely on a hard-coded default endpoint.
