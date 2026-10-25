@@ -18,6 +18,8 @@ The project author's assembled version uses a **D1 mini ESP8266 development boar
 | None | — | There is **no physical learning button**. Learning is started from the Web UI using the IR receiver. Do not add a learn button to GPIO0. |
 
 ![Corrected enclosure views with labeled openings and controls](hardware/circuit-diagram.png)
+![Corrected enclosure views with labeled openings and controls](hardware/Overkill_marketing_collage.png)
+
 
 ## Conflict still requiring a physical check
 
