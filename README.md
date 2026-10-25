@@ -17,7 +17,7 @@ The project combines a compact, PETG-printed enclosure with a browser-based setu
 
 This is a DIY build, not a plug-and-play retail product. You should expect to source the components, assemble and test the electronics, print the enclosure in PETG, flash the firmware and configure the local MQTT/Home Assistant path. Alexa voice control adds separate Amazon/AWS account and cloud setup, and requires an internet connection. The hub's local Web UI and local MQTT/Home Assistant path are intended for local control; Alexa's cloud voice path is not fully local.
 
-The author's physical build uses a **D1 mini ESP8266 development board**, which already includes 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. Before assembly, read the pin-map warning below: the compile-time flash-CS setting and current connection image both use GPIO3, but the firmware's Stage Info diagnostic still prints GPIO15 for flash CS. GPIO3 is also UART0 RX, so serial input/programming needs to be tested on the actual D1 mini.
+The author's build is based on a **D1 mini ESP8266 development board**, which provides 3.3 V regulation. The alternative bare ESP-12F build needs a suitable external 5 V-to-3.3 V regulator. The intended pin map is explicit in the committed diagram and compile-time firmware settings: W25Q32 flash CS is GPIO3 (D1 mini RX), the single status LED is GPIO2 (D4, active LOW), IR TX is GPIO4, IR RX is GPIO5, and DS18B20 data defaults to GPIO16. Learning starts in the Web UI and uses the IR receiver; there is no physical learn button. The underside reset button connects to the board's dedicated RST pad, not a general GPIO. Because GPIO3 is also UART0 RX, test storage, boot and serial-programming behavior on the actual D1 mini before calling the physical build validated.
 
 ## Product and hardware preview
 
@@ -36,7 +36,7 @@ The enclosure image shows the three top-plate openings for the **DS18B20 tempera
 The diagram is the wiring reference for the electronics. It uses ESP-12F GPIO names, while the author's physical build uses a D1 mini, so follow the [D1 mini pin-map notes](hardware/PIN-MAP.md) when wiring that board.
 
 > [!CAUTION]
-> The compile-time firmware constant and the uploaded connection diagram assign W25Q32 flash CS to **GPIO3**, but the firmware's Stage Info diagnostic still prints **GPIO15**. GPIO3 is also UART0 RX on the D1 mini. Verify the actual wiring and serial-programming behaviour before treating the circuit as fully validated; see the [release checklist](docs/RELEASE_CHECKLIST.md).
+> The intended wiring in the compile-time firmware setting and committed circuit diagram is **W25Q32 CS → GPIO3/RX** and **single status LED → GPIO2/D4 (active LOW)**. The Stage Info diagnostic is stale and reports GPIO15 for flash CS; the code's pin constant and diagram specify GPIO3. GPIO3 is also UART0 RX on the D1 mini, so test the actual board's flash operations, boot and serial-programming/debug workflow before treating the physical build as validated. There is no physical learn button (use the Web UI and IR receiver), and the underside reset button uses the dedicated RST pad.
 
 ## Indicative component cost
 
@@ -55,6 +55,8 @@ As a rough reference, six major component line items total about **US$3.34**, co
 *The prices are converted from [Quartz Components' Indian listings](https://quartzcomponents.com/) using a [USD/INR reference rate of ₹94.76 per US dollar](https://exchangeratetool.com/historical/usd-inr) for 25 October 2026. This is an illustration for international readers, not a worldwide quote.* It excludes the IR receiver, status LED, resistors, capacitors, wiring, 5 V supply and cable, PETG filament and print waste, tools, shipping, taxes, and any optional regulator. Local prices and import costs will vary; the linked IR LED listing was shown as sold out when checked.
 
 The sections below walk through the hardware, firmware, the Home Assistant discovery choices, the Alexa connection options, AWS IoT certificates and cloud Alexa setup in detail.
+
+**Reproducible-build status:** the documented board is a D1 mini, the external W25Q32 flash is 4 MiB, and IRremoteESP8266 is pinned to 2.9.0. The ESP8266 Arduino core version and actual internal flash size/layout still need to be recorded from a successful target-board build; see [Firmware installation and initial hub configuration](docs/FIRMWARE.md). No verified precompiled firmware binary is supplied.
 
 ## Build journey
 
@@ -85,17 +87,17 @@ Alexa Smart Home skill
   -> ESP8266 hub -> IR LED driver -> appliance
 ```
 
-The cloud Alexa architecture above is optional. For local command switches, the firmware's Emulated Hue server is discovered on the LAN through SSDP and uses the learned commands enabled per command in the Web UI; it does not need this AWS/Lambda path. For cloud Alexa, the supplied Lambda uses the retained device catalogue at `alexa/config/devices` by default and publishes commands to `alexa/{hub}/directive`. It requires the `IOT_ENDPOINT` environment variable. The Home Assistant integration's AWS bridge uses a separate X.509 certificate/key pair and connects over MQTT/TLS.
+The cloud Alexa architecture above is optional as a feature, but **account linking through Login with Amazon is mandatory when you configure the Alexa Smart Home skill**. For local command switches, the firmware's Emulated Hue server is discovered on the LAN through SSDP and uses the learned commands enabled per command in the Web UI; it does not need this AWS/Lambda path. For cloud Alexa, the supplied Lambda uses the retained device catalogue at `alexa/config/devices` by default and publishes commands to `alexa/{hub}/directive`. It requires the `IOT_ENDPOINT` environment variable. The Home Assistant integration's AWS bridge uses a separate X.509 certificate/key pair and connects over MQTT/TLS.
 
 ## Repository status
 
-The firmware sources, Lambda, hardware assets and documentation are in this repository. The original 3MF is at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The connection diagram and labeled enclosure image are visual references; they do not replace the 3MF printable model. GPIO3 is shared by flash CS and UART0 RX in the current firmware, as documented in the diagram. The companion Home Assistant integration is now maintained separately at [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration); consult [Home Assistant: native MQTT vs custom integration](docs/CUSTOM_INTEGRATION.md) before choosing a setup. The main project repository's license status is described by its root license files.
+The firmware sources, updated Lambda, circuit diagram, labeled enclosure image and original 3MF model are committed. The diagram is [`hardware/circuit-diagram.png`](hardware/circuit-diagram.png), the labeled enclosure image is [`hardware/Overkill_labeled.png`](hardware/Overkill_labeled.png), and the printable model is [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The source constant and diagram agree on flash CS = GPIO3; the remaining hardware validation is to test flash persistence, boot and serial programming on the actual D1 mini. The companion Home Assistant integration is maintained separately at [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration). The repository still has no `LICENSE` file; `LICENSE_PENDING.md` is only a reminder, not a license.
 
-The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on confirming flash-CS wiring and serial behaviour on the actual D1 mini, correcting the stale Stage Info GPIO15 diagnostic, and completing hardware tests.
+The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The intended flash-CS pin is GPIO3 in both the source constant and diagram; the remaining hardware validation is to test W25Q32 read/write/erase and persistence, boot stability and serial programming on the actual D1 mini. The build is not yet reproducible because the ESP8266 core version and the board's internal-flash size/layout have not been recorded.
 
 ## Current Lambda source
 
-[Open `alexa_lambda/index.mjs`](alexa_lambda/index.mjs). The repository version does not use `ALEXA_EVENT_CLIENT_ID` / `ALEXA_EVENT_CLIENT_SECRET`; it does not implement event-gateway token exchange or token refresh. Keep **Send Alexa Events** disabled unless the Lambda is extended and tested.
+[Open `alexa_lambda/index.mjs`](alexa_lambda/index.mjs). The committed repository version does not read `ALEXA_EVENT_CLIENT_ID`, `ALEXA_EVENT_CLIENT_SECRET` or `DELETE_LEGACY_TV_SCENES_ON_ACCEPT_GRANT`. It does not implement Alexa Event Gateway token exchange/refresh or legacy TV-scene deletion on `AcceptGrant`, so these variables have no effect on this source. Keep **Send Alexa Events** disabled unless the deployed Lambda is verified to implement and test that support. If the deployed Lambda differs, export its current source and synchronize it with this repository before describing its environment variables as supported.
 
 ## References
 
