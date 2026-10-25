@@ -1,5 +1,7 @@
 # Firmware installation and initial hub configuration
 
+> **Choose your integrations deliberately:** the firmware offers Native HA MQTT (entities only, no Alexa) or Custom Integration (Alexa + HA entities) discovery mode. Cloud Alexa's device-aware remote controls require the companion [OverKill Smart Hub custom integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration) and Custom Integration mode. The separate local Emulated Hue feature can expose individual learned commands as momentary on/off light switches. Compare the options in [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md).
+
 This guide covers preparing the Arduino toolchain, compiling/flashing the ESP8266, first boot, Wi-Fi and MQTT configuration, appliance learning, backup and OTA.
 
 ## Prepare the firmware build environment
