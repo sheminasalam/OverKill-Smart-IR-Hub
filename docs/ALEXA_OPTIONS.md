@@ -90,6 +90,22 @@ The table below is based on the committed `alexa_lambda/index.mjs` and the firmw
 | **LIGHT** | Power; set/adjust brightness | Power command(s), plus learned commands matching levels such as `Brightness 25`, `Brightness 50`, `Brightness 100`. A requested brightness value needs a matching learned command; the hub cannot synthesize an arbitrary brightness IR signal. |
 | **SWITCH** | Basic power on/off only | Power command(s). Use this for generic devices, plugs or relays without a richer supported type. |
 
+### Example voice requests for the cloud route
+
+These are example request patterns for the capabilities above, not a guarantee that every phrase will be routed to this Smart Home skill in every Alexa locale. Use the device's friendly name in place of the bracketed name.
+
+| Device category | Example requests |
+|---|---|
+| **TV / SETTOP** | “Alexa, turn on [TV]”; “Alexa, volume up on [TV]”; “Alexa, mute [TV]”; “Alexa, next channel on [TV]”. Direct requests such as “change the channel to 12” depend on Alexa routing a `ChangeChannel` directive to the Smart Home skill; test this before relying on it. |
+| **STREAMER** | “Alexa, turn on [streamer]”; “Alexa, play [streamer]”; “Alexa, pause [streamer]”; “Alexa, skip to the next item on [streamer]”. |
+| **SPEAKER** | “Alexa, turn on [speaker]”; “Alexa, turn the volume down on [speaker]”; “Alexa, mute [speaker]”. |
+| **FAN** | “Alexa, turn on [fan]”; “Alexa, set [fan] speed to 3”; “Alexa, turn on oscillation on [fan]”. Supported speed range defaults to 1–6. |
+| **AC** | “Alexa, set [AC] to 24 degrees”; “Alexa, increase [AC] temperature”; “Alexa, set [AC] mode to cool”; “Alexa, set [AC] fan speed to 3”; “Alexa, turn on turbo mode on [AC]”. The reported setpoint is estimated from commands, not sensed from the AC. |
+| **LIGHT** | “Alexa, turn on [light]”; “Alexa, set [light] brightness to 50 percent”. Brightness values work only when the learned-command set provides a matching `Brightness N` command. |
+| **SWITCH** | “Alexa, turn on [switch]”; “Alexa, turn off [switch]”. |
+
+For **local Emulated Hue**, the simpler pattern is “Alexa, turn on [device name + command name]”, for example “turn on Bedroom AC Temp Up”. That activates the individual learned command as a momentary switch; it is not the cloud Smart Home remote and does not provide the per-device capabilities in the table above.
+
 The Lambda also accepts category aliases: `TELEVISION` → `TV`; `STB`/`SETTOPBOX` → `SETTOP`; `AIRCON`/`AIRCONDITIONER` → `AC`; `SOUNDBAR` → `SPEAKER`; `PLUG`, `RELAY` and `GENERIC` → `SWITCH`; `STREAMING` → `STREAMER`.
 
 ### Naming and state caveats
