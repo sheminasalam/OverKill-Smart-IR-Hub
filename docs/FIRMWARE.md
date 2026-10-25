@@ -17,7 +17,7 @@ The repository layout stores these files under firmware/; Arduino IDE may expect
 
 - Serial debugging is enabled in the supplied source.
 - GPIO0 is treated as an ESP8266 boot-strap pin; source output says the physical learn button was removed/disabled.
-- Firmware's Stage Info prints GPIO15 for W25Qxx CS, but the actual compile-time PIN_FLASH_CS constant is GPIO3. This is a release blocker; see ../hardware/PIN-MAP.md.
+- The compile-time PIN_FLASH_CS constant is GPIO3, while the supplied connection diagram labels flash CS as GPIO15. This is a release blocker; see ../hardware/PIN-MAP.md.
 - Web UI features include Wi-Fi/MQTT configuration, IR learning/relearning, command and device management, flash status, backup/restore, OTA, and automations.
 - Current source defines 10 automation rules and 10 schedules, with up to 6 triggers and 8 steps per rule; 4 jobs can run in the runtime queue.
 - Web UI OTA uses port 8080 at /update. Use only on a trusted network, with reliable power.
