@@ -13,13 +13,13 @@ The physical build uses a **D1 mini ESP8266 development board**. The current upl
 | GPIO14 | D5 | W25Q32 SCLK |
 | GPIO16 | D0 | DS18B20 temperature data default |
 | RST | RST | Physical reset button under the enclosure |
-| None | — | There is no physical learning button. Start learning from the Web UI and use the IR receiver to capture the original remote's signal. |
+| None | — | There is no physical learning button or supported learn-button control. Start learning from the Web UI and use the IR receiver to capture the original remote's signal. GPIO0 appears only in a legacy input initialization; no physical learn button should be wired there. |
 
 ## Flash CS and serial diagnostic mismatch
 
-The current circuit diagram assigns W25Q32 CS to GPIO3, matching the compile-time constant `PIN_FLASH_CS = 3` in `firmware/OverKill-v1.ino`. However, the firmware's Stage Info diagnostic currently prints `GPIO15 -> W25Qxx CS`. That printed label is stale and should be corrected to GPIO3 before release.
+The current circuit diagram assigns W25Q32 CS to GPIO3, matching the compile-time constant `PIN_FLASH_CS = 3` in `firmware/OverKill-v1.ino`. The Stage Info diagnostic still prints `GPIO15 -> W25Qxx CS`; that is a stale log label, not the source's configured CS pin.
 
-GPIO3 is also UART0 RX / D1 mini RX. Sharing this line with flash CS can affect serial input, flashing or diagnostics depending on the board's USB-UART wiring and the timing of serial activity. Confirm on the actual D1 mini that the W25Q32 CS wire reaches GPIO3, verify boot and flash operations, and test the programming/debug workflow. Do not remap the pin or redraw the diagram unless the physical build and firmware are changed together.
+GPIO3 is also UART0 RX / D1 mini RX. The intended mapping is documented, but the repository cannot prove how a physical board has been wired. On the actual D1 mini, test flash JEDEC detection/read/write/erase, data persistence across power cycles, boot stability and the serial programming/debug workflow. Do not remap the pin or redraw the diagram unless the physical build and firmware are changed together.
 
 ## Enclosure provisions and controls
 
