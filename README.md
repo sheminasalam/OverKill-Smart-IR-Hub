@@ -339,6 +339,41 @@ For the **Home Assistant bridge certificate**, the integration needs:
 
 AWS policy ARNs for topic filters and topic names are different resource types. AWS policy wildcards use IAM-style `*` and `?`; MQTT's `+` and `#` are topic-filter syntax and are not wildcards in policy resource ARNs. Restrict resources to the required topics and client ID. See [AWS publish/subscribe policy examples](https://docs.aws.amazon.com/iot/latest/developerguide/pub-sub-policy.html) and [retained-message policy examples](https://docs.aws.amazon.com/iot/latest/developerguide/retained-message-policy-examples.html). Test the policy with the bridge logs rather than adopting a broad `iot:*` rule.
 
+
+#### Example policy template for the Home Assistant bridge certificate
+
+Replace `REGION`, `ACCOUNT_ID` and `BRIDGE_CLIENT_ID`. Set the bridge client ID explicitly in the OverKill setup form so it matches this policy. Review the policy for your account before attaching it to a certificate.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "iot:Connect",
+      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:client/BRIDGE_CLIENT_ID"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iot:Subscribe",
+      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:topicfilter/alexa/????/directive"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iot:Receive",
+      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:topic/alexa/????/directive"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["iot:Publish", "iot:RetainPublish"],
+      "Resource": "arn:aws:iot:REGION:ACCOUNT_ID:topic/alexa/config/devices"
+    }
+  ]
+}
+```
+
+The `????` wildcard pattern targets the four-character hub tag used in the directive topic. If the deployment uses custom topics or client IDs, change the ARNs to match.
+
 ## 14. Configure the AWS bridge in Home Assistant
 
 1. Open **Settings → Devices & services → OverKill Smart Hub** and start the integration's bridge setup/additional bridge flow as appropriate.
