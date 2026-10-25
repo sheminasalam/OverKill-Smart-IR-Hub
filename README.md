@@ -5,11 +5,11 @@ A D1 mini ESP8266 universal infrared hub with IR learning/replay through the IR 
 This repository is being prepared as a reproducible DIY build guide. Follow the documentation in order and keep the known hardware blocker in view.
 
 > [!CAUTION]
-> **The supplied circuit is not yet a verified final schematic.** The firmware constant sets external flash CS to GPIO3, but the supplied diagram labels it GPIO15. The built version uses one status LED, a reset button underneath the enclosure, and no physical learning button. Learning is started in the Web UI and uses the top-plate IR receiver. The original drawing's RGB LED and learn-button depiction are outdated. Resolve the separate flash-CS GPIO3/GPIO15 mismatch before final assembly. See [Pin-map review](hardware/PIN-MAP.md) and [visual review](hardware/pin-map-review.svg).
+> **Use the corrected connection diagram below.** It shows W25Q32 flash CS on GPIO3 to match the firmware constants; GPIO3 is also UART0 RX, so the diagram notes the serial-console limitation and cautions against remapping the pin. The enclosure image identifies the three top openings, USB-C 5 V input provision, and underside reset pinhole. The hardware has one status LED and no physical learning button; learning is started from the Web UI using the IR receiver. See the [pin-map notes](hardware/PIN-MAP.md).
 
-**Connection diagram:** [Updated ESP-12F schematic (SVG)](hardware/OverKill-ESP12F-Connection-Diagram.svg). This drawing is for a bare ESP-12F with a separate regulator. Do not copy it unchanged onto a D1 mini: the firmware uses GPIO3 as flash CS, while a D1 mini's onboard USB-UART TX is also connected to GPIO3. See the hardware guide before wiring.
+**Corrected connection diagram:** [Open the connection diagram (PNG)](hardware/OverKill-Connection-Diagram.png). It shows the ESP-12F pin names used by the firmware. A bare ESP-12F needs a suitable 5 V-to-3.3 V regulator; the author's D1 mini build already has onboard regulation. GPIO3 is also UART0 RX, so read the serial/flash-CS note in the diagram and [pin-map notes](hardware/PIN-MAP.md).
 
-![Labeled enclosure render generated from the supplied 3MF](hardware/OverKill-3MF-Labeled-Product.svg)
+![Corrected enclosure views with labeled openings and controls](hardware/OverKill-Enclosure-Views.png)
 
 **Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The SVG above is a visual reference, **not** the printable 3MF file.
 
@@ -38,7 +38,7 @@ The supplied Lambda uses the retained device catalogue at `alexa/config/devices`
 
 ## Repository status
 
-The firmware sources, updated Lambda, core documentation and pin-map review are committed. The original 3MF is committed at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The labeled SVG above is a model-derived preview, not a printable substitute. The updated vector connection schematic is committed at [hardware/OverKill-ESP12F-Connection-Diagram.svg](hardware/OverKill-ESP12F-Connection-Diagram.svg). It matches the firmware's default GPIO constants for a bare ESP-12F variant, but the D1 mini variant needs the GPIO3/UART conflict resolved before treating it as directly buildable. The companion integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
+The firmware sources, updated Lambda, documentation, corrected connection diagram and enclosure feature views are committed. The original 3MF is at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The circuit diagram and enclosure-view image are visual references; they do not replace the 3MF printable model. GPIO3 is shared by flash CS and UART0 RX in the current firmware, as documented in the diagram. The companion Home Assistant integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
 
 The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on the verified flash-CS connection, matching schematic and successful hardware tests.
 
