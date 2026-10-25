@@ -7,6 +7,8 @@ This repository is being prepared as a reproducible DIY build guide. Follow the 
 > [!CAUTION]
 > **The supplied circuit is not yet a verified final schematic.** The firmware constant sets external flash CS to GPIO3, but the supplied diagram labels it GPIO15. The built version uses one status LED, a reset button underneath the enclosure, and no physical learning button. Learning is started in the Web UI and uses the top-plate IR receiver. The original drawing's RGB LED and learn-button depiction are outdated. Resolve the separate flash-CS GPIO3/GPIO15 mismatch before final assembly. See [Pin-map review](hardware/PIN-MAP.md) and [visual review](hardware/pin-map-review.svg).
 
+**Connection diagram:** [Updated ESP-12F schematic (SVG)](hardware/OverKill-ESP12F-Connection-Diagram.svg). This drawing is for a bare ESP-12F with a separate regulator. Do not copy it unchanged onto a D1 mini: the firmware uses GPIO3 as flash CS, while a D1 mini's onboard USB-UART TX is also connected to GPIO3. See the hardware guide before wiring.
+
 ![Labeled enclosure render generated from the supplied 3MF](hardware/OverKill-3MF-Labeled-Product.svg)
 
 **Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The SVG above is a visual reference, **not** the printable 3MF file.
@@ -36,7 +38,7 @@ The supplied Lambda uses the retained device catalogue at `alexa/config/devices`
 
 ## Repository status
 
-The firmware sources, updated Lambda, core documentation and pin-map review are committed. The original 3MF is committed at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The labeled SVG above is a model-derived preview, not a printable substitute. The original circuit drawing image is not yet committed; the pin-map review is reference material and not the final verified schematic. The companion integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
+The firmware sources, updated Lambda, core documentation and pin-map review are committed. The original 3MF is committed at [`3d_printing/Overkill.3mf`](3d_printing/Overkill.3mf). The labeled SVG above is a model-derived preview, not a printable substitute. The updated vector connection schematic is committed at [hardware/OverKill-ESP12F-Connection-Diagram.svg](hardware/OverKill-ESP12F-Connection-Diagram.svg). It matches the firmware's default GPIO constants for a bare ESP-12F variant, but the D1 mini variant needs the GPIO3/UART conflict resolved before treating it as directly buildable. The companion integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
 
 The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on the verified flash-CS connection, matching schematic and successful hardware tests.
 
