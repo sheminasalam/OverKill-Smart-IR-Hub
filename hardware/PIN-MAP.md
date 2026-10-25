@@ -17,6 +17,8 @@ The project author's assembled version uses a **D1 mini ESP8266 development boar
 | RST | RST | Physical reset button is on the underside of the enclosure and resets the D1 mini |
 | None | — | There is **no physical learning button**. Learning is started from the Web UI using the IR receiver. Do not add a learn button to GPIO0. |
 
+![Corrected enclosure views with labeled openings and controls](hardware/OverKill-ESP12F-Connection-Diagram.svg)
+
 ## Conflict still requiring a physical check
 
 The firmware's compile-time `PIN_FLASH_CS` constant is GPIO3 (D1 mini RX), but the original connection diagram labels the flash CS as GPIO15 (D8 on a typical D1 mini). These are not interchangeable assumptions. Determine which pad on the actual board goes to the W25Q32 module's CS pin, then align the source and final circuit. Do not treat the old drawing or firmware status message alone as proof of the physical wiring.
