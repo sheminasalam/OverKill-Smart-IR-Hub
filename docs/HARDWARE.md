@@ -2,7 +2,7 @@
 
 This page documents the actual build: a D1 mini development board, W25Q32 flash, USB-C 4-pin power breakout, IR receiver and transmitter, waterproof DS18B20 probe, one status LED, an underside reset button and a PETG enclosure. The original ESP-12F circuit drawing must be adapted for the D1 mini board labels.
 
-**Current connection diagram:** [Open the uploaded circuit diagram (PNG)](../hardware/circuit-diagram.png). It shows flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS = 3` constant in the firmware. There is still a source diagnostic mismatch: the Stage Info printout says `GPIO15 -> W25Qxx CS`. Treat that printed label as stale until corrected. The diagram uses ESP-12F GPIO names, while the author's build uses a D1 mini; on that board GPIO3 is labelled RX and is also connected to the USB-UART interface. Verify serial programming/debug behaviour on the actual board before treating it as a final validated schematic.
+**Current connection diagram:** [Open the committed circuit diagram (PNG)](../hardware/circuit-diagram.png). It shows flash CS on GPIO3, matching the compile-time `PIN_FLASH_CS = 3` constant. The intended pin mapping is therefore clear; the Stage Info serial diagnostic is stale and prints `GPIO15 -> W25Qxx CS`. GPIO3 is labelled RX on a D1 mini and is shared with UART0 RX, so the physical build still needs tests for flash read/write/erase, boot and serial programming before it can be called hardware-validated. The diagram uses ESP-12F GPIO names; apply the D1 mini label mapping in [PIN-MAP.md](../hardware/PIN-MAP.md).
 
 ## Bill of materials (BOM)
 
@@ -26,8 +26,8 @@ This table reflects the components used in the author's build. The main controll
 | 1 | 100 nF capacitor | 3.3 V high-frequency decoupling; place close to the ESP/peripheral supply pins where practical. |
 | 1 | [Waterproof DS18B20 temperature probe](https://quartzcomponents.com/products/ds18b20-water-proof-temperature-sensor?variant=31898050953351) | Exact sensor used. The top plate has an opening for the probe. Firmware default data pin is GPIO16; confirm the cable colours/pinout before connecting. |
 | 1 | 4.7 kΩ resistor | Pulls the DS18B20 data line up to 3.3 V. |
-| 1 | Status LED and current-limiting resistor | A single status LED sits in one of the top-plate openings. Firmware default is GPIO2, active LOW. The built device does not use the RGB LED shown in the old drawing. |
-| 1 | Momentary reset button | Installed underneath the device and connected to the D1 mini's RST input. It is a **reset button**, not an IR-learning button. |
+| 1 | Single status LED and current-limiting resistor | One status LED only, connected to GPIO2 (D1 mini D4), active LOW. This matches the current firmware default. No RGB LED is fitted. |
+| 1 | Momentary reset button | Installed underneath the device and connected to the D1 mini's dedicated RST input (not a general GPIO). It is a **reset button**, not an IR-learning button. There is no physical learning button. |
 | 1 | 3D-printed enclosure | [Original `Overkill.3mf`](../3d_printing/Overkill.3mf) is committed in this repository. Print in **PETG**. The top-plate openings are for the DS18B20 probe, IR receiver used for learning, and status LED; the side provision accommodates the USB-C power breakout PCB; the reset button is underneath. |
 | As needed | Headers, wire, insulation, mounting hardware | Test-fit the USB-C breakout, D1 mini, sensor probe, receiver and LED before final soldering. Actual screw/inserts and fit tolerances still require a test print. |
 
@@ -78,7 +78,7 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 1. With all power removed, identify the actual W25Qxx module's CS pad.
 2. Use a continuity meter to determine which ESP-12F pad it reaches. Do not infer the connection from wire colour or from a rendered image.
 3. Compare that physical connection against `PIN_FLASH_CS` in the firmware.
-4. Confirm the W25Q32 CS wire on the actual D1 mini goes to GPIO3/RX as the current image and compile-time constant specify. Correct the Stage Info diagnostic so it also reports GPIO3. If the hardware really uses another pin, update the code and diagram together instead.
+4. Confirm the W25Q32 CS wire on the actual D1 mini goes to GPIO3/RX as the current image and compile-time constant specify. The Stage Info diagnostic currently reports GPIO15 incorrectly; the compile-time constant and diagram specify GPIO3. If the physical board is wired differently, stop and reconcile the wiring, source and diagram together before powering the flash.
 5. Test boot, serial programming, flash JEDEC-ID detection, read/write/erase and power-cycle persistence.
 6. Use the uploaded [connection diagram](../hardware/circuit-diagram.png) as the current reference, but do not treat an image alone as proof of the physical wiring.
 
@@ -96,7 +96,7 @@ The current code constant and connection image both use GPIO3 for flash CS, but 
 6. **Build one IR LED branch.** Wire the resistor, two series LEDs and MOSFET load path using the polarity in the verified circuit. Add the 100 Ω gate resistor and 10 kΩ gate pulldown as drawn. Check branch current with a suitable meter/test setup.
 7. **Add the remaining five branches** only after current and thermal checks. Make wiring and supply distribution thick enough for the current.
 8. **Install the DS18B20 probe.** Fit the waterproof probe into its top-plate opening, connect data to GPIO16 by default and add the 4.7 kΩ pull-up from data to 3.3 V. Check the probe cable pinout/colours rather than relying on assumed wire colours.
-9. **Install the single status LED** in its top-plate opening. Firmware defaults to GPIO2 (D1 mini D4), active LOW, through a suitable current-limiting resistor. The built device does not use the RGB LED drawn in the older diagram.
+9. **Install the single status LED** in its top-plate opening. Firmware defaults to GPIO2 (D1 mini D4), active LOW, through a suitable current-limiting resistor. Do not fit an RGB LED; the current BOM calls for one status LED only.
 10. Install the IR receiver in its top-plate opening and orient it so it can receive the original remote. Learning is started from the Web UI; the receiver captures the IR signal. There is no physical learning button. Install the reset button underneath and connect it to the D1 mini RST input. Inspect solder joints, polarity, insulation, strain relief and clearance in the enclosure. Do not connect the full-power IR array until the low-current logic/flash tests pass.
 
 ## Print and fit the enclosure
