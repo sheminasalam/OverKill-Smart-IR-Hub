@@ -7,6 +7,10 @@ This repository is being prepared as a reproducible DIY build guide. Follow the 
 > [!CAUTION]
 > **The supplied circuit is not yet a verified final schematic.** The firmware constant sets external flash CS to GPIO3, but the supplied diagram labels it GPIO15. The status LED and button wiring also differ between code and drawing. Resolve these against the actual board before final assembly. See [Pin-map review](hardware/PIN-MAP.md) and [visual review](hardware/pin-map-review.svg).
 
+![Labeled enclosure render generated from the supplied 3MF](hardware/OverKill-3MF-Labeled-Product.svg)
+
+**Enclosure printing:** print the enclosure in **PETG**. Follow [Hardware, BOM, assembly and enclosure](docs/HARDWARE.md) for preparation and test-fitting. The SVG above is a visual reference, **not** the printable 3MF file.
+
 ## Build and setup guides
 
 1. [**Hardware, BOM, assembly and 3D printing**](docs/HARDWARE.md) — parts with exact supplier links, power/driver safety, pin conflict and enclosure fit.
@@ -31,7 +35,7 @@ The supplied Lambda uses the retained device catalogue at `alexa/config/devices`
 
 ## Repository status
 
-The firmware sources, updated Lambda, core documentation and pin-map review are committed. The 3MF enclosure and original circuit image are not yet committed to this repository. The companion integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
+The firmware sources, updated Lambda, core documentation and pin-map review are committed. The original 3MF enclosure and original circuit image are not yet committed to this repository. The labeled SVG above is a model-derived preview only; it cannot be used as a substitute for the 3MF. The companion integration is supplied separately for now and should be published in its own repository before HACS submission. There is no project license yet; `LICENSE_PENDING.md` is a reminder, not a license.
 
 The repository's source-check workflow validates Python syntax and JSON files. It does not compile the ESP8266 firmware or prove AWS/Alexa end-to-end behavior. The first release remains blocked on the verified flash-CS connection, matching schematic and successful hardware tests.
 
