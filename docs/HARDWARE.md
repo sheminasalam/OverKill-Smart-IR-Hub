@@ -26,7 +26,7 @@ This BOM consolidates parts named in the supplied diagram and firmware. Items ma
 | 1 | Status LED and current-limiting resistor | Firmware default is one active-LOW status output on GPIO2. The circuit drawing depicts a common-anode RGB LED and three GPIOs, which do not match the present firmware pin map. Choose one implementation after verifying code and hardware. |
 | 1 | Reset/programming arrangement | Use the reset and boot/program pins required by the ESP-12F carrier. The additional reset button shown in the diagram is not represented by a separate GPIO in the current firmware source. |
 | As needed | PCB/perfboard, headers, connectors, wire, insulation, mounting hardware | Exact PCB, connector and fastener part numbers were not included in the supplied files. |
-| 1 | 3D-printed enclosure | Print the supplied `Overkill.3mf` in **PETG**. The model still needs a test print to validate fit, screw/insert dimensions and clearances. |
+| 1 | 3D-printed enclosure | Print the supplied `Overkill.3mf` in **PETG**. The original 3MF is not yet committed to this repository; the linked SVG is a preview, not a printable substitute. The model needs a test print to validate fit, screw/insert dimensions and clearances. |
 
 ### Power and LED safety
 
@@ -93,6 +93,10 @@ Do not follow the original diagram blindly while the CS conflict is unresolved. 
 10. Inspect solder joints, polarity, insulation, strain relief and clearance in the enclosure. Do not connect the full-power IR array until the low-current logic/flash tests pass.
 
 ## Print and fit the enclosure
+
+![Labeled enclosure render from the 3MF](../hardware/OverKill-3MF-Labeled-Product.svg)
+
+The image labels the outer parts/features present in the model. It does not show the electronics.
 
 The project uses the supplied multi-object `Overkill.3mf` model. **Print the enclosure in PETG.** PETG is the specified project material for the enclosure. The model is not proof of a tested print profile, and the screw/insert dimensions and physical clearances have not yet been validated against an assembled unit. Use the filament manufacturer's recommended profile as the starting point; do not assume an untested universal temperature, fan or speed setting.
 
