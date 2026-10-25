@@ -2,6 +2,8 @@
 
 This page documents the actual build: a D1 mini development board, W25Q32 flash, USB-C 4-pin power breakout, IR receiver and transmitter, waterproof DS18B20 probe, one status LED, an underside reset button and a PETG enclosure. The original ESP-12F circuit drawing must be adapted for the D1 mini board labels.
 
+**Circuit reference:** [Updated bare ESP-12F connection diagram](../hardware/OverKill-ESP12F-Connection-Diagram.svg). The diagram follows the firmware's default GPIO constants and shows a standalone ESP-12F plus external 3.3 V regulator. It is not a drop-in D1 mini schematic: on a D1 mini, the onboard USB-UART TX is connected to GPIO3/RX0, which the current firmware also uses as flash CS. Isolate that UART-TX connection or redesign the CS pin and firmware together before using the D1 mini variant.
+
 ## Bill of materials (BOM)
 
 This table reflects the components used in the author's build. The main controller in the built device is a **D1 mini ESP8266 development board**. The original drawing uses bare ESP-12F module pin labels, so a bare-module build needs the additional regulator noted below.
