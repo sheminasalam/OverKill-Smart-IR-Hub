@@ -1,5 +1,7 @@
 # AWS IoT, Lambda, account linking and Alexa setup
 
+> **This guide covers the cloud Alexa Smart Home path only.** For device-aware remote controls (TV, fan, AC, streamer and other supported categories), the **OverKill Smart Hub custom integration is required** and the hub must use **Custom Integration (Alexa + HA entities)** discovery mode. The firmware's local **Emulated Hue** option is an alternative for simple on/off command switches on the LAN; it does not use AWS or this guide's cloud route. See [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md) before starting.
+
 ## Create the AWS IoT Core bridge certificate
 
 This section describes the AWS IoT client used by the Home Assistant integration. It is distinct from the IAM role used by Lambda.
