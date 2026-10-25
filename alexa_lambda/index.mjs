@@ -26,11 +26,12 @@ const T = {
 };
 const WRITE_STATE = ENV.WRITE_STATE !== "false";
 
+if (!ENV.IOT_ENDPOINT) throw new Error("IOT_ENDPOINT environment variable is required");
+
 const client = new IoTDataPlaneClient({
   region: ENV.IOT_REGION || "eu-west-1",
-  endpoint: ENV.IOT_ENDPOINT || "https://a3b9l1ppl6jewh-ats.iot.eu-west-1.amazonaws.com"
+  endpoint: ENV.IOT_ENDPOINT.startsWith("https://") ? ENV.IOT_ENDPOINT : `https://${ENV.IOT_ENDPOINT}`
 });
-
 // ---------- small helpers ----------
 const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -497,6 +498,7 @@ function plan(d, st, header, pl) {
       }
       return null;
     }
+
     case "Alexa.ThermostatController.SetTargetTemperature": {
       if (d.cat !== "AC") return null;
       // Best-effort absolute setpoint: compare against the last setpoint saved by
