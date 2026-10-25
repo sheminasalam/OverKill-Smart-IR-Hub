@@ -65,7 +65,6 @@ bool serialEnabled = true;
 // FINAL GPIO ASSIGNMENT
 // ============================================================
 
-constexpr uint8_t PIN_LEARN_BUTTON = 0;
 constexpr uint8_t PIN_FLASH_MISO   = 12;
 constexpr uint8_t PIN_FLASH_MOSI   = 13;
 constexpr uint8_t PIN_FLASH_SCLK   = 14;
@@ -1490,7 +1489,6 @@ void initializeHardwarePins() {
   pinMode(pinIrTx, OUTPUT);
   digitalWrite(pinIrTx, LOW);
   pinMode(pinIrRx, INPUT);
-  pinMode(PIN_LEARN_BUTTON, INPUT_PULLUP);
   pinMode(pinDs18b20, INPUT);
   pinMode(PIN_FLASH_CS, OUTPUT);
   digitalWrite(PIN_FLASH_CS, HIGH);
@@ -10541,7 +10539,7 @@ void printStageInfo() {
   Serial.println(F("Architecture   : Stage 3 - IR + Storage + Temperature + Status LED + Wi-Fi + MQTT + NTP + Automation + WebUI"));
   Serial.println();
   Serial.println(F("FINAL GPIO MAP"));
-  Serial.println(F("GPIO0  -> Reserved ESP8266 boot strap (physical Learn button removed)"));
+  Serial.println(F("GPIO0  -> Reserved ESP8266 boot strap (not assigned to a user control)"));
   Serial.println(F("GPIO1  -> UART0 TX (available)"));
   Serial.print(F("GPIO")); Serial.print(pinStatusLed); Serial.println(F("  -> Status LED (active LOW)"));
   Serial.println(F("GPIO3  -> UART0 RX (available)"));
