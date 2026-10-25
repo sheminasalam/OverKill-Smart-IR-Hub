@@ -1,57 +1,64 @@
-# Home Assistant custom integration and HACS release
+# Home Assistant: native MQTT vs OverKill Smart Hub integration
 
-## Install the Home Assistant custom integration
+The firmware offers two Home Assistant **discovery modes** in **Configuration → Configure Hub → Discovery**. Select one based on what you want:
 
-The supplied integration ZIP is for manual installation and is not yet the final HACS distribution. It contains a folder named `overkill_smart_hub`. Do not copy `__pycache__` or `.pyc` files into the release.
+| Firmware discovery mode | What it does | What it does not do |
+|---|---|---|
+| **Native HA MQTT (entities only, no Alexa)** | Uses Home Assistant's built-in MQTT integration and the hub's native MQTT discovery to create supported Home Assistant entities. | Does not publish the custom integration's Alexa cloud device catalogue or route cloud Alexa directives. |
+| **Custom Integration (Alexa + HA entities)** | Publishes the hub's custom discovery/configuration messages used by the OverKill Smart Hub integration, supports the companion integration's hub/entity features, and enables the integration to collect Alexa cloud device configuration. | Does not itself set up AWS, Lambda or an Alexa Smart Home skill. Those are separate optional components for cloud Alexa. |
 
-### Manual installation
+**Important:** selecting **Native HA MQTT** is not the same as installing the **OverKill Smart Hub custom integration**. Native discovery is the firmware's built-in entity route. The custom integration is a separate Home Assistant add-on. For Alexa's *cloud Smart Home remote-control path*, use **Custom Integration** mode and install the custom integration. Local **Emulated Hue** is a third, separate firmware feature and can be used with either discovery mode.
 
-1. Make a backup of Home Assistant.
-2. From the provided integration ZIP, copy the clean `overkill_smart_hub` directory to:
+Changing the firmware discovery mode clears retained topics associated with the previous mode; select the intended mode and allow its discovery sync to complete.
 
-   `/config/custom_components/overkill_smart_hub/`
+## Option A — Native Home Assistant MQTT entities
 
-   The resulting directory must contain `manifest.json`, `__init__.py`, `config_flow.py`, `coordinator.py`, `hub.py`, `aws_bridge.py`, `cloud_broker.py`, the entity/platform files, translations and the other integration resources directly inside the domain directory.
-3. If using **local MQTT**, set up Home Assistant's MQTT integration first. It must connect to the same broker the hub publishes to.
-4. Restart Home Assistant.
-5. Open **Settings → Devices & services → Add integration** and search for **OverKill Smart Hub**.
-6. In the submitted version, the first-time configuration flow opens the AWS bridge setup first and requests an AWS endpoint plus Root CA, device certificate and private key. Complete that bridge step before proceeding to MQTT transport selection. If local-only usage without any AWS bridge is required, this flow should be adjusted before release; the supplied version does not provide a skip button on its initial entry path.
-7. Choose the MQTT transport mode:
-   - **Local**: use Home Assistant's existing MQTT integration; there is no separate broker hostname form for this mode.
-   - **Cloud**: enter the cloud MQTT broker host, port and optional client credentials.
-   - **Both**: configure both paths as requested. For cloud modes, use a broker the remote ESP8266 can actually reach.
-8. Finish the setup flow and wait for MQTT hub discovery. Confirm the discovered hub in the UI and give it a meaningful name. Explicitly select the intended AWS bridge for that hub; choose **None (no Alexa bridge)** for a hub that should remain local-only.
-9. Watch **Settings → System → Logs** for the OverKill integration. Confirm the hub is online and configuration/device sync completes.
-10. Confirm the expected OverKill hub device and its button/sensor entities in Home Assistant.
-11. If the hub is publishing to a cloud broker, verify host, port, credentials and exact base topic. A successful connection to the wrong broker will not produce discovery on the intended Home Assistant instance.
+Choose this if you only want the supported Home Assistant entities and do not need the OverKill custom integration features or Alexa cloud remote.
 
-### What the integration forwards
+1. Set up Home Assistant's built-in **MQTT** integration and a broker reachable by the ESP8266.
+2. In the hub Web UI, open **Configuration → Configure Hub → Discovery** and choose **Native HA MQTT (entities only, no Alexa)**.
+3. Open **Configuration → Configure MQTT** on the hub. Enable MQTT and point it at the same broker that Home Assistant uses.
+4. Keep **Enable Home Assistant Auto Discovery** enabled, save and allow the hub's retained discovery messages to synchronize.
+5. Confirm the discovered entities in Home Assistant.
 
-The firmware publishes Home Assistant MQTT discovery under the configured base topic and Alexa configuration messages under its system topic namespace, including a per-hub four-hex-digit tag. The integration listens for retained discovery/catalogue sync, creates hub/entity config entries and, for hubs assigned to an AWS bridge, merges the cloud-exposed devices into a retained catalogue at `alexa/config/devices`.
+No AWS IoT endpoint, certificates, Lambda, Alexa Smart Home skill, or OverKill custom integration is needed for this setup. If you still want Alexa to trigger selected IR commands on the local network, configure **Emulated Hue** separately; see [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md).
 
-The integration subscribes to the configured AWS directive filter, normally `alexa/+/directive`, and routes messages by the four-hex-digit tag in the topic. Keep the hub's `<TAG>_<device-id>` identity pattern intact and assign each hub to the correct bridge.
+## Option B — OverKill Smart Hub custom integration
 
-A Home Assistant service named `overkill_smart_hub.rediscover_hubs` requests rediscovery if you need the integration to reconcile retained discovery after a broker/hub change.
+Choose this when you want the companion integration's hub-specific discovery and entities, multi-hub/transport handling, or **Alexa cloud Smart Home remote control**.
 
-## HACS publication plan for the companion integration
+1. Install [OverKill Smart Hub Integration](https://github.com/sheminasalam/OverKill-Smart-Hub-Integration). Until it is accepted into HACS default repositories, add it through **HACS → Integrations → Custom repositories** (category **Integration**) or follow the repository's manual installation instructions.
+2. In the hub Web UI, set **Configuration → Configure Hub → Discovery** to **Custom Integration (Alexa + HA entities)**.
+3. Configure the hub's MQTT connection.
+4. In Home Assistant, configure the custom integration and select the appropriate MQTT transport:
+   - **Local** — uses Home Assistant's existing MQTT integration/broker. Both the hub and Home Assistant must be able to reach the same broker.
+   - **Cloud** — uses a separately configured MQTT broker reachable by the hub and Home Assistant.
+   - **Both** — permits discovery from local and cloud MQTT sources.
+5. Confirm the hub when it appears and assign a name. Select **None (no Alexa bridge)** if you are not setting up Alexa cloud.
+6. If you want cloud Alexa, create/configure the AWS IoT bridge and assign the hub to the correct bridge. Then enable **Alexa Cloud** and choose a category for every device you want discovered by the Lambda.
 
-The firmware/hardware repository and Home Assistant integration serve different release purposes. HACS requires one integration per repository under `custom_components/<domain>/`; this project has multiple components, so the integration should be extracted into a dedicated public repository with the domain directory at the required path. See [HACS integration publishing](https://www.hacs.dev/docs/publish/integration/) and [HACS default inclusion](https://www.hacs.dev/docs/publish/include/).
+### MQTT transport is not the AWS Alexa bridge
 
-Before announcing a HACS release:
+**Local / Cloud / Both** selects the MQTT transport used to find and communicate with hubs. The **AWS IoT bridge** is a separate TLS-secured link that carries the retained device catalogue and Alexa directives. You can use the custom integration without configuring an AWS bridge; cloud Alexa is the feature that needs the AWS/Lambda/skill path.
 
-1. Create the separate integration repository.
-2. Place the files under `custom_components/overkill_smart_hub/` and remove `__pycache__`/compiled bytecode.
-3. Add an accurate root README, integration manifest, `hacs.json` and license.
-4. Verify all manifest requirements and dependency assumptions against the target Home Assistant version.
-5. Run the HACS Action and Home Assistant Hassfest checks.
-6. Test in a clean Home Assistant installation, including local, cloud and both transport modes; multiple hubs; multiple bridge assignment; TLS errors; reconnect/reload; device removal; retained-catalogue refresh; and Alexa directive delivery.
-7. Create a GitHub Release after passing checks. Only then submit a PR to HACS default if that is the intended distribution route.
+Security note: the integration's optional Cloud MQTT transport currently uses plain MQTT (typically port 1883) without TLS. Do not expose that broker directly to the public Internet; use a secured private network/VPN and appropriate credentials, ACLs and firewall restrictions.
 
-The integration ZIP provided during this preparation included Python bytecode files, which must not be kept in the source repository.
+## How Alexa exposure works in the firmware
 
+The firmware has two separate exposure controls:
 
-## Important behavior found during source review
+- **Emulated Hue (local Alexa):** enabled per learned command using **Edit Command → Expose learned command to Alexa**. Each exposed command appears as an on/off light. Turning it on transmits the learned IR command; the item returns to off. Up to 32 commands can be exposed locally. This behaves like a momentary button, not appliance state feedback.
+- **Alexa Cloud (Smart Home):** enabled per device using **Edit Device → Device Category** and **Alexa Cloud**. The cloud Lambda exposes the device using its category and supports the richer command set listed in [Alexa and Home Assistant connection options](ALEXA_OPTIONS.md). This route requires **Custom Integration** discovery mode.
 
-- A fresh integration setup currently opens the AWS bridge form when no bridge entry exists; it asks for the endpoint and three PEM files before reaching the transport selector. The current first-run path therefore does not offer a straightforward skip-AWS route for a local-only user, even though Local MQTT is one of the later transport choices.
-- The Lambda supports a per-device `channels` mapping, but the current bridge catalogue builder sends only `id`, `name` and `type`. Named-channel metadata is therefore not automatically carried through the bridge. Numeric channel selection is the documented dependable route until the catalogue builder is changed and tested.
-- The cloud MQTT path in the provided integration is plain MQTT. Do not publish port 1883 openly to the Internet; use a protected network/broker setup and suitable ACLs.
+The two exposure types are independent. You can use both for one hub if you want specific commands as local light switches while also exposing full devices through the cloud. Avoid exposing duplicate commands unless you intentionally want both Alexa representations.
+
+For the full AWS IoT, Lambda deployment, account linking, skill endpoint and certificate steps, see [AWS IoT, Lambda, account linking and Alexa](ALEXA_AWS.md).
+
+## Troubleshooting
+
+- **Native entities do not appear:** check that Home Assistant's MQTT integration and broker are connected, the hub points to that broker, MQTT is enabled, Home Assistant discovery is enabled and the firmware is set to Native HA MQTT mode.
+- **The custom integration does not discover a hub:** check that the firmware is in Custom Integration mode, the correct transport/broker is configured, the hub's base topic is unique, and discovery sync completed. The integration's `overkill_smart_hub.rediscover_hubs` service can request rediscovery after correcting a broker or topic.
+- **Alexa cloud discovers no devices:** confirm Custom Integration mode, the integration is running, the device has a category and **Alexa Cloud** is enabled, the retained catalogue is present at `alexa/config/devices`, and the hub is explicitly assigned to the intended AWS bridge.
+- **Local Emulated Hue devices are missing:** verify that the hub and Echo are on the same LAN and that Wi-Fi multicast/SSDP discovery is allowed. Check the local Hue status in **Configure Hue / Alexa** and ensure each intended command is enabled.
+
+When requesting help, include the discovery mode, MQTT transport, relevant sanitized logs and Home Assistant version. Redact broker passwords, AWS certificate private keys and secrets.
