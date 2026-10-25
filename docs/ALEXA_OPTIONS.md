@@ -75,20 +75,45 @@ Alexa Smart Home skill
 
 For this route, **the OverKill Smart Hub custom integration is required**. It publishes the retained Alexa device catalogue to AWS IoT and forwards directives back to the correct hub. The hub must be in **Custom Integration** discovery mode, and the device must have both a category and **Alexa Cloud** exposure enabled. See [AWS, Lambda and Alexa setup](ALEXA_AWS.md) for the full account, certificate and skill steps.
 
-## 3. Alexa cloud device types and supported controls
+## 3. Alexa cloud device types and exact learned command names
 
-The table below is based on the committed `alexa_lambda/index.mjs` and the firmware's command-name resolver. It describes capabilities implemented by this version—not a guarantee that every phrasing will be recognized identically in every Alexa locale.
+**The command names matter.** For Alexa cloud control, the Lambda translates an Alexa directive into one or more command names and the firmware looks for those names **inside the same learned device/remote**. Exposing a device to Alexa Cloud is not enough by itself: learn the buttons the device type needs, then name them according to the reference below.
 
-| Firmware device category | Controls handled by the cloud Lambda | Learned commands the hub needs |
+### Command-name reference
+
+| Cloud device category | Alexa action | Learned command name(s) to use in the firmware |
 |---|---|---|
-| **TV** | Power on/off; volume up/down; mute; channel up/down; direct numeric channel selection when Alexa sends a supported channel directive | Prefer separate `Power On` and `Power Off` commands (or a `Power` toggle as a fallback); `Volume Up`, `Volume Down`, `Mute`, `Channel Up`, `Channel Down`, and numeric keys `0`–`9` |
-| **SETTOP** | Same cloud controls as TV: power, volume, mute and channel commands | Same learned commands as TV. Choose **SETTOP** for a set-top box. |
-| **STREAMER** | Power; volume up/down; mute; Play, Pause, Stop, Next, Previous, Rewind, Fast Forward and Start Over | Power command(s), `Volume Up`, `Volume Down`, `Mute`, and the corresponding playback commands |
-| **SPEAKER** | Power; volume up/down; mute | Power command(s), `Volume Up`, `Volume Down`, `Mute`. Playback controls are not enabled for this category in the current Lambda. |
-| **FAN** | Power; set/increase/decrease fan speed; oscillation on/off | Power command(s); speed levels such as `Speed 1`–`Speed 6` or numeric buttons `1`–`6`; `Speed Up`/`Speed Down` can be used as fallbacks; `Oscillate On`/`Oscillate Off` or a single `Oscillate` toggle |
-| **AC** | Power; set/adjust target temperature in °C; thermostat mode; AC fan speed; swing, turbo and sleep toggles | Power command(s); `Temp Up`, `Temp Down`; `Mode COOL`, `Mode AUTO`, `Mode ECO`; `Fan Speed 1`–`Fan Speed 5` or numeric speed buttons, with `Fan Up`/`Fan Down` as fallbacks; `Swing On`/`Swing Off`, `Turbo On`/`Turbo Off`, and `Sleep On`/`Sleep Off` (or the corresponding single toggle commands) |
-| **LIGHT** | Power; set/adjust brightness | Power command(s), plus learned commands matching levels such as `Brightness 25`, `Brightness 50`, `Brightness 100`. A requested brightness value needs a matching learned command; the hub cannot synthesize an arbitrary brightness IR signal. |
-| **SWITCH** | Basic power on/off only | Power command(s). Use this for generic devices, plugs or relays without a richer supported type. |
+| **All categories with power** (TV, SETTOP, STREAMER, SPEAKER, FAN, AC, LIGHT, SWITCH) | Turn on | Prefer **`Power On`**. If the appliance only has one power toggle, **`Power`** is accepted as a fallback. |
+| **All categories with power** | Turn off | Prefer **`Power Off`**. If the appliance only has one power toggle, **`Power`** is accepted as a fallback. A single toggle is less reliable for state because the firmware cannot know whether the appliance is already on. |
+| **TV / SETTOP** | Increase/decrease volume | **`Volume Up`**, **`Volume Down`** |
+| **TV / SETTOP** | Mute | **`Mute`** (see the important mute note below) |
+| **TV / SETTOP** | Next/previous channel | **`Channel Up`**, **`Channel Down`** |
+| **TV / SETTOP** | Select a numeric channel | Learn numeric buttons **`0`–`9`** on that TV/set-top-box device. The Lambda sends each digit as a separate step, e.g. channel 125 becomes `1`, `2`, `5`. Alexa must actually deliver a supported `ChangeChannel` directive for direct selection; voice routing varies, so test this in your locale. |
+| **STREAMER** | Volume/mute | **`Volume Up`**, **`Volume Down`**, **`Mute`** |
+| **STREAMER** | Playback | **`Play`**, **`Pause`**, **`Stop`**, **`Next`**, **`Previous`**, **`Rewind`**, **`Fast Forward`**, **`Start Over`** |
+| **SPEAKER** | Volume/mute | **`Volume Up`**, **`Volume Down`**, **`Mute`**. Playback controls are not enabled for this category in the current Lambda. |
+| **FAN** | Set fan speed | Prefer speed-level commands named **`Speed 1`** through **`Speed 6`** (the current default range). The firmware also tries the numeric command **`1`–`6`** if a matching `Speed N` command is missing. |
+| **FAN** | Increase/decrease fan speed | **`Speed Up`**, **`Speed Down`** are the fallback buttons when the exact requested speed level is not available. |
+| **FAN** | Oscillation on/off | Prefer **`Oscillate On`** and **`Oscillate Off`**. A single **`Oscillate`** toggle command is accepted as a fallback. |
+| **AC** | Adjust target temperature | **`Temp Up`**, **`Temp Down`**. The Lambda repeats the relevant learned button to move from its saved temperature estimate to the requested setpoint. |
+| **AC** | Set operating mode | **`Mode COOL`**, **`Mode AUTO`**, **`Mode ECO`**. These are the current default modes supplied to the cloud Lambda. A mode will only work if it is allowed by the device catalogue and its corresponding command has been learned. |
+| **AC** | Set AC fan speed | Prefer **`Fan Speed 1`** through **`Fan Speed 5`** (the current default range). The firmware tries numeric commands **`1`–`5`** if the matching `Fan Speed N` command is missing. |
+| **AC** | Increase/decrease AC fan speed | **`Fan Up`**, **`Fan Down`** are the fallback buttons when the exact requested fan-speed command is not available. |
+| **AC** | Swing on/off | Prefer **`Swing On`** and **`Swing Off`**. A single **`Swing`** toggle command is accepted as a fallback. |
+| **AC** | Turbo on/off | Prefer **`Turbo On`** and **`Turbo Off`**. A single **`Turbo`** toggle command is accepted as a fallback. |
+| **AC** | Sleep on/off | Prefer **`Sleep On`** and **`Sleep Off`**. A single **`Sleep`** toggle command is accepted as a fallback. |
+| **LIGHT** | Set/adjust brightness | Learn commands named for the brightness levels you expect to use, e.g. **`Brightness 0`**, **`Brightness 25`**, **`Brightness 50`**, **`Brightness 75`**, **`Brightness 100`**. The requested numeric value must match a learned command; this Lambda does not translate an arbitrary brightness value into an approximate learned level. |
+| **SWITCH** | Basic on/off | Power commands only: **`Power On`**, **`Power Off`**, or **`Power`** as the single-toggle fallback. |
+
+### Rules the firmware uses when matching names
+
+- Matching is **case-insensitive** and removes spaces, underscores, hyphens and other punctuation. For example, `Fast Forward`, `Fast_Forward` and `FastForward` resolve to the same normalized name.
+- The word **`Temperature`** is normalized to **`Temp`**, so `Temperature Up` can match the Lambda's `Temp Up` request.
+- The Lambda can provide alternatives such as **`Power On|Power`**. The firmware tries the alternatives in order and transmits the first matching learned command. Therefore, separate **On** and **Off** commands are preferred; a single **Power** command is only a toggle fallback.
+- Repeated commands use the same learned key multiple times. Direct channel entry uses the learned digit keys in sequence.
+- Names must belong to the **same device entry** you have selected for Alexa Cloud. A `Volume Up` command learned under the TV will not be found for a separate set-top-box device.
+
+**Mute caveat:** in the current Lambda, both Alexa mute and unmute directives become the single learned **`Mute`** command. Most IR remotes implement Mute as a toggle, so Alexa's expected mute state can get out of sync. This implementation does not send separate `Mute On` and `Mute Off` names.
 
 ### Example voice requests for the cloud route
 
@@ -99,22 +124,21 @@ These are example request patterns for the capabilities above, not a guarantee t
 | **TV / SETTOP** | “Alexa, turn on [TV]”; “Alexa, volume up on [TV]”; “Alexa, mute [TV]”; “Alexa, next channel on [TV]”. Direct requests such as “change the channel to 12” depend on Alexa routing a `ChangeChannel` directive to the Smart Home skill; test this before relying on it. |
 | **STREAMER** | “Alexa, turn on [streamer]”; “Alexa, play [streamer]”; “Alexa, pause [streamer]”; “Alexa, skip to the next item on [streamer]”. |
 | **SPEAKER** | “Alexa, turn on [speaker]”; “Alexa, turn the volume down on [speaker]”; “Alexa, mute [speaker]”. |
-| **FAN** | “Alexa, turn on [fan]”; “Alexa, set [fan] speed to 3”; “Alexa, turn on oscillation on [fan]”. Supported speed range defaults to 1–6. |
+| **FAN** | “Alexa, turn on [fan]”; “Alexa, set [fan] speed to 3”; “Alexa, turn on oscillation on [fan]”. |
 | **AC** | “Alexa, set [AC] to 24 degrees”; “Alexa, increase [AC] temperature”; “Alexa, set [AC] mode to cool”; “Alexa, set [AC] fan speed to 3”; “Alexa, turn on turbo mode on [AC]”. The reported setpoint is estimated from commands, not sensed from the AC. |
-| **LIGHT** | “Alexa, turn on [light]”; “Alexa, set [light] brightness to 50 percent”. Brightness values work only when the learned-command set provides a matching `Brightness N` command. |
+| **LIGHT** | “Alexa, turn on [light]”; “Alexa, set [light] brightness to 50 percent”. Brightness requests work only when that matching `Brightness N` command is learned. |
 | **SWITCH** | “Alexa, turn on [switch]”; “Alexa, turn off [switch]”. |
 
-For **local Emulated Hue**, the simpler pattern is “Alexa, turn on [device name + command name]”, for example “turn on Bedroom AC Temp Up”. That activates the individual learned command as a momentary switch; it is not the cloud Smart Home remote and does not provide the per-device capabilities in the table above.
+For **local Emulated Hue**, the simpler pattern is “Alexa, turn on [device name + command name]”, for example “turn on Bedroom AC Temp Up”. That activates the individual learned command as a momentary switch; it is not the cloud Smart Home remote and does not require the special cloud command-name mapping above.
 
 The Lambda also accepts category aliases: `TELEVISION` → `TV`; `STB`/`SETTOPBOX` → `SETTOP`; `AIRCON`/`AIRCONDITIONER` → `AC`; `SOUNDBAR` → `SPEAKER`; `PLUG`, `RELAY` and `GENERIC` → `SWITCH`; `STREAMING` → `STREAMER`.
 
-### Naming and state caveats
+### Additional limitations
 
-- The firmware compares learned command names without regard to letter case, spaces, underscores or hyphens. It also treats “Temperature” as “Temp”. The Lambda may try a preferred command name and then a fallback name. If no learned command matches, that step is skipped and the directive can finish partially.
-- If possible, learn distinct **on** and **off** buttons. A single physical power-toggle button is only a fallback; a software state estimate can get out of sync when the appliance is controlled by its original remote.
 - TV channel **up/down** is handled as a relative command. Direct channel selection requires numeric digits. The Lambda has a code path for `ChangeChannel`, but Alexa may route some TV/channel utterances away from a Smart Home skill, depending on the setup. Test it in your Alexa locale before relying on it.
 - The current integration catalogue forwards basic `id`, `name` and `type` fields; it does **not** automatically pass the Lambda's optional named-channel mapping. Use numeric channel entry and learned digit keys as the dependable configuration for now.
-- AC target temperature is an estimate based on the last temperature command sent through the cloud Lambda, not a measurement reported by the air conditioner. Using the physical remote or another control path can make that estimate inaccurate. Current catalogue defaults are 16–30 °C, modes COOL/AUTO/ECO, 6 fan speeds for FAN and 5 for AC unless the catalogue supplies overrides.
+- AC target temperature is an estimate based on the last temperature command sent through the cloud Lambda, not a measurement reported by the air conditioner. Using the physical remote or another control path can make that estimate inaccurate.
+- Current catalogue defaults are 16–30 °C, modes COOL/AUTO/ECO, 6 fan speeds for FAN and 5 for AC.
 - The Lambda deliberately does not expose TV input selection or input-cycle scenes in this version.
 
 ## 4. Which path should I choose?
