@@ -54,6 +54,6 @@
 </g>
 <rect x="35" y="952" width="1530" height="63" rx="14" fill="#fff" stroke="#bfd0e4" stroke-width="2"/>
 <text x="60" y="978" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#173a65">IMPORTANT</text>
-<text x="170" y="978" font-family="Arial,sans-serif" font-size="15" fill="#354b65">MODEL VIEW: enclosure geometry only; electronics are not installed in this render. Top: DS18B20, IR receiver for learning, status LED. Side: USB-C 5 V breakout provision. Underside: reset button. There is no physical learn button.</text>
-<text x="60" y="1000" font-family="Arial,sans-serif" font-size="14" fill="#4d5d74">Print in PETG. The D1 mini has onboard 3.3 V regulation; a bare ESP-12F requires an external 5 V-to-3.3 V regulator.</text>
+<text x="170" y="978" font-family="Arial,sans-serif" font-size="15" fill="#354b65">Top: DS18B20, IR receiver (learning), status LED. Side: USB-C 5 V input. Underside: reset button. No physical learn button.</text>
+<text x="60" y="1000" font-family="Arial,sans-serif" font-size="14" fill="#4d5d74">Enclosure-only render; electronics are not shown. Print PETG. Bare ESP-12F needs external 3.3 V regulation.</text>
 </svg>
