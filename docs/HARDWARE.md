@@ -65,12 +65,12 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 | W25Qxx MISO | GPIO12 | SPI bus |
 | W25Qxx MOSI | GPIO13 | SPI bus |
 | W25Qxx SCLK | GPIO14 | SPI bus |
-| W25Qxx CS | **GPIO3** | Matches the current connection image and compile-time constant. The Stage Info diagnostic still prints GPIO15 and needs correction. GPIO3 is also UART0 RX; verify the board's serial/programming behaviour. |
+| W25Qxx CS | **GPIO3** | Matches the current connection image and compile-time constant. The Stage Info diagnostic now prints GPIO3 for flash CS. GPIO3 is also UART0 RX; verify the board's serial/programming behaviour. |
 | IR TX | GPIO4 default | Can be changed in the Web UI's Hub configuration; confirm the resulting pin allocation. |
 | IR RX | GPIO5 default | Can be changed in the Web UI's Hub configuration; confirm the resulting pin allocation. |
 | Status LED | GPIO2 default, active LOW | Firmware uses a single status indicator. |
 | DS18B20 data | GPIO16 default | Optional; can be changed in Hub configuration. |
-| Physical learn button | **None** | There is no physical learning button. Learning is initiated from the Web UI and signals are received by the IR receiver. Do not add a learn button to GPIO0. |
+| Physical learning button / GPIO | **None** | No physical learning button or learn-button GPIO is used. Start learning from the Web UI and use the IR receiver. GPIO0 remains an ESP8266 boot-strap pin, not a user control. |
 | UART0 TX/RX | GPIO1 / GPIO3 | Used for serial upload/debugging. GPIO3's use as flash CS in the current source requires special attention. |
 
 **Do this now, before fabricating or powering the final assembly:**
@@ -78,7 +78,7 @@ The following are the current defaults in `firmware/OverKill-v1.ino`. They are n
 1. With all power removed, identify the actual W25Qxx module's CS pad.
 2. Use a continuity meter to determine which ESP-12F pad it reaches. Do not infer the connection from wire colour or from a rendered image.
 3. Compare that physical connection against `PIN_FLASH_CS` in the firmware.
-4. Confirm the W25Q32 CS wire on the actual D1 mini goes to GPIO3/RX as the current image and compile-time constant specify. The Stage Info diagnostic currently reports GPIO15 incorrectly; the compile-time constant and diagram specify GPIO3. If the physical board is wired differently, stop and reconcile the wiring, source and diagram together before powering the flash.
+4. Confirm the W25Q32 CS wire on the actual D1 mini goes to GPIO3/RX as the current image and compile-time constant specify. If the physical board is wired differently, stop and reconcile the wiring, source and diagram together before powering the flash.
 5. Test boot, serial programming, flash JEDEC-ID detection, read/write/erase and power-cycle persistence.
 6. Use the uploaded [connection diagram](../hardware/circuit-diagram.png) as the current reference, but do not treat an image alone as proof of the physical wiring.
 
@@ -86,11 +86,11 @@ The actual firmware constant is the code's behaviour; the fact that a drawing la
 
 ## Assemble and inspect the electronics
 
-The current code constant and connection image both use GPIO3 for flash CS, but the firmware's Stage Info diagnostic still reports GPIO15 and GPIO3 is also UART0 RX on the D1 mini. Verify that hardware path and correct the diagnostic output before finalizing the build.
+The code constant, Stage Info diagnostic and connection image now all specify GPIO3 for flash CS. GPIO3 is also UART0 RX on the D1 mini, so the physical build still needs testing for flash read/write/erase, power-cycle persistence, boot stability and serial programming.
 
 1. **Prepare the 5 V input.** Solder/connect the 4-pin USB-C breakout in its enclosure provision. Wire VBUS to the 5 V input and GND to common ground; leave D+/D− unconnected for power-only operation. The breakout has no CC1/CC2 pins, so use a USB-A source with a USB-A-to-USB-C cable unless you add and validate the proper USB-C CC pull-down arrangement. For the D1 mini build, feed 5 V to its 5V input pin and let its onboard regulator produce 3.3 V. For a bare ESP-12F build, connect 5 V to the AMS1117 module input and use its 3.3 V output for the ESP/peripherals.
 2. **Verify grounds.** Confirm continuity among ESP GND, flash GND, IR receiver GND, MOSFET source/ground and the 5 V LED supply ground.
-3. **Install external flash.** Connect VCC to 3.3 V, GND to GND, MISO to GPIO12, MOSI to GPIO13 and SCLK to GPIO14. Connect CS to GPIO3 as shown in the current diagram and compile-time constant, but verify the actual D1 mini wiring and remember GPIO3 is also UART0 RX. The firmware's Stage Info label saying GPIO15 is stale and should be corrected. Do not power a 3.3 V flash module from 5 V.
+3. **Install external flash.** Connect VCC to 3.3 V, GND to GND, MISO to GPIO12, MOSI to GPIO13 and SCLK to GPIO14. Connect CS to GPIO3 as shown in the current diagram and compile-time constant, but verify the actual D1 mini wiring and remember GPIO3 is also UART0 RX. The Stage Info diagnostic has been corrected to print GPIO3. Do not power a 3.3 V flash module from 5 V.
 4. **Inspect for shorts.** Measure between 3.3 V and GND and between 5 V and GND before attaching the ESP. Investigate any near-short before power-on.
 5. **Add the IR receiver.** Connect its supply and ground according to the board labels; use GPIO5 as the default OUT signal unless the firmware/Web UI configuration is changed.
 6. **Build one IR LED branch.** Wire the resistor, two series LEDs and MOSFET load path using the polarity in the verified circuit. Add the 100 Ω gate resistor and 10 kΩ gate pulldown as drawn. Check branch current with a suitable meter/test setup.
